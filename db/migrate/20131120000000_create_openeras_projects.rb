@@ -29,10 +29,9 @@ class CreateOpenerasProjects < ActiveRecord::Migration
       t.boolean         :has_breaks
       t.integer         :age
 
-      t.boolean         :published, default: false
+      t.iox_document_defaults
 
-      t.integer         :created_by
-      t.integer         :updated_by
+      t.belongs_to      :label
 
       t.timestamps
     end

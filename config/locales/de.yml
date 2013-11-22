@@ -1,7 +1,10 @@
 de:
-  openeras:
-    projects:
-      title: "Projekte"
+  projects:
+    title: "Projekte"
 
-    venues:
-      title: "Spielorte"
+  venues:
+    title: "Spielorte"
+
+  openeras:
+    label:
+      new: "Neues Label"

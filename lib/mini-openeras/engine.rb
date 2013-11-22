@@ -1,10 +1,10 @@
 require 'iox/engine'
 
-module Openeras
+module MiniOpeneras
 
   class Engine < ::Rails::Engine
 
-    isolate_namespace Iox
+    isolate_namespace Openeras
 
     initializer :assets do |config|
       Rails.application.config.assets.precompile += %w(

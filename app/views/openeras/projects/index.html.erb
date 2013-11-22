@@ -1,0 +1,154 @@
+<%= content_for :add_js do %>
+  <%= javascript_include_tag "openeras/common" %>
+<% end %>
+<%= content_for :add_css do %>
+  <%= stylesheet_link_tag "openeras/common", media: "all" %>
+<% end %>
+
+<div class="iox-sidebar">
+
+  <!--<div class="iox-sidebar-arrow"></div>-->
+  <div class="iox-sidebar-frame">
+
+    <div class="iox-tree-control">
+      <form>
+        <input type="text" name="query" placeholder="<%= t('filter_results') %> " />
+        <input type="submit" value="<%= t('search') %>" />
+        <a href="#" data-tree-role="search" title="<%= t('filter_results') %>"><i class="icon-search"></i></a>
+        <a href="#" data-tree-role="refresh" title="<%= t('refresh') %>"><i class="icon-refresh"></i></a>
+        <a href="#" class="btn btn-success" data-tree-role="new" title="<%= t('openeras.label.new') %>"><i class="icon-plus"></i></a>
+      </form>
+    </div>
+
+    <ul id="iox-content-list"></ul>
+
+  </div>
+
+</div>
+
+<div class="iox-content offset-sidebar">
+  <div class="iox-content-frame hide">
+    <div id="iox-content-details" class="iox-form" data-bind="template: { name: 'iox-content-form-template' }">
+    </div>
+  </div>
+  <div class="iox-details-placeholder">
+    <i class="icon-info-sign"></i>
+    <%= t('webpages.click_on_webpage_to_show_details') %>
+  </div>
+</div>
+
+<script id="iox-tree-item-template" type="text/html">
+  <li data-bind=" attr: { 'data-id': id, id: 'item_'+id }, click: markItem">
+    <div class="item clearfix" data-bind=" css: { selected: _selected, hide: _hide }">
+      <div class="actions">
+        <span class="color-ball" data-bind="attr: { class: color }"></span>
+      </div>
+      <a class="title" data-bind="click: listContent, attr: { title: name }, text: name"></a>
+    </div>
+  </li>
+</script>
+
+<script type="text/javascript">
+
+  $(document).ready( function(){
+
+    $('#iox-content-list').ioxTree({
+      url: '/openeras/projects/labels',
+      observe: ['name', 'color'],
+      control: $('.iox-tree-control'),
+      i18n:{
+        noEntriesFound: '<%= t('filter_no_entries_found') %>'
+      },
+      events: {
+        afterRemove: function afterRemove( item ){
+          $('.iox-details-placeholder').show();
+          $('.iox-content-frame').hide();
+        },
+        item: {
+
+          /**
+           * lists content of this item in a grid
+           */
+          listContent: function listContent( item, e ){
+            console.log('list content');
+          },
+
+          /*
+           * show the webpage form (depending on the webpage's template)
+           * for editing existing webpages
+           */
+          showForm: function showForm( item, e ){
+            $('.iox-details-placeholder').hide();
+            $('.iox-content-frame').show();
+            setupItemForm( item );
+          },
+
+          /**
+           * save an existing webpage
+           */
+          saveItemForm: function saveItemForm( form ){
+            var self = this;
+            if( this._validator.validate() ){
+              $('.iox-content-frame').block();
+              $.ajax({ url: self._master.options.url+'/'+self.id, data: $(form).serializeArray(), dataType: 'json', type: 'put'
+              }).done( function( json ){
+                $('.iox-content-frame').unblock();
+                iox.flash.rails( json.flash );
+              });
+            } else {
+              iox.flash.notice('<%= t('please_fill_out_all_fields') %>');
+              return false;
+            }
+          }
+
+        },
+
+        tree: {
+
+          /**
+           * ask for the new item's name
+           * and create it immediately
+           */
+          newItemForm: function newItem( e, tree, TreeItem ){
+            var name = prompt('<%= t('name') %>','');
+            if( name && name.length > 0 ){
+
+              var self = this;
+
+              $.ajax({ 
+                url: '/openeras/labels', 
+                data: { name: name, category: 'project' }, 
+                dataType: 'json', 
+                type: 'post' 
+              }).done( function( json ){
+                if( json.success ){
+                  var item = new TreeItem( json.item, tree );
+                  if( item.parent_id ){
+                    var $parentLi = $(self._master.obj).find('li[data-id='+item.parent_id+']');
+                    var parent = ko.dataFor($parentLi.get(0));
+                    if( $parentLi.find('.open-folder').length ){
+                      if( $parentLi.find('.open-folder').length && $parentLi.find('.open-folder').hasClass('open') )
+                        parent.children.push( item );
+                      else
+                        $parentLi.find('.open-folder').click();
+                    } else{
+                      $parentLi.find('.folder-spacer').addClass('open-folder').click();
+                    }
+                  } else
+                    self._master.items.push( item );
+                  setupItemForm( item );
+                }
+                iox.flash.rails( json.flash );
+              });
+
+            }
+          }
+
+        }
+
+      }
+    });
+
+  });
+
+</script>

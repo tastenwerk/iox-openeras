@@ -25,7 +25,7 @@ class CreateOpenerasEvents < ActiveRecord::Migration
 
       t.integer       :festival_id
 
-      t.belongs_to    :program_entry
+      t.belongs_to    :project
       t.belongs_to    :venue
 
       t.integer       :import_foreign_db_id

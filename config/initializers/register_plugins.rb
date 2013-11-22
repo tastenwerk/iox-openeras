@@ -2,7 +2,7 @@
 Rails.configuration.iox.plugins ||= []
 
 
-Rails.configuration.iox.plugins << Iox::Plugin.new( name: 'openeras_projects',
+Rails.configuration.iox.plugins << Iox::Plugin.new( name: 'projects',
                                                     roles: [],
                                                     icon: 'icon-sitemap',
                                                     path: '/openeras/projects' )

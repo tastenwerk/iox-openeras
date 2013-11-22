@@ -77,23 +77,6 @@ module Openeras
 
     end
 
-    def new
-      @program_entry = ProgramEntry.new duration: 90, categories: Rails.configuration.iox.publive_categories.first
-      @layout = true
-    end
-
-    def settings_for
-      check_404_and_privileges
-      @obj = @program_entry
-      render template: '/iox/program_entries/settings_for', layout: false
-    end
-
-    def find_conflicting_names
-      @conflicts = ProgramEntry.where("LOWER(title) LIKE ? AND ends_at>?","%#{params[:title].downcase}%", Time.now)
-      @conflicts = @conflicts.where("id != ?", params[:program_entry_id]) unless params[:program_entry_id].blank?
-      render json: @conflicts.load
-    end
-
     def create
       @program_entry = ProgramEntry.new entry_params
       @layout = true

@@ -1,4 +1,4 @@
-]class CreateOpenerasFiles < ActiveRecord::Migration
+class CreateOpenerasFiles < ActiveRecord::Migration
   def change
     create_table :openeras_files do |t|
 
@@ -8,8 +8,8 @@
       t.string      :copyright
       t.integer     :position, default: 0
 
-      t.belongs_to  :openeras_project
-      t.belongs_to  :openeras_venue
+      t.belongs_to  :project
+      t.belongs_to  :venue
 
       t.timestamps
 
