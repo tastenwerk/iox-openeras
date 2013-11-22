@@ -1,7 +1,0 @@
-<% if flash.alert %>
-  iox.flash.alert('<%= flash.alert %>');
-<% else %>
-  crewData.data.push( <%= raw(@json_person) %> );
-  reloadPreview();
-<% end %>
-$('.stepContainer').unblock(); 
