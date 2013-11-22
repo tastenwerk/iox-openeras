@@ -1,0 +1,35 @@
+<div class="iox-content-frame auto-overflow">
+
+  <%= render partial: '/iox/common/form_control', locals: { item_ns: 'openeras.project', item_url: '/openeras/projects' } %>
+
+  <div class="webpage-head-control iox-form-control">
+
+    <a class="btn" data-bind=" attr: { href: '/openeras/projects/'+id }" rel="tooltip" title="<%= t("#{controller.controller_name.singularize}.view") %>"><i class="icon-eye icon"></i></a>
+
+  </div>
+
+  <div class="iox-tabs">
+
+    <ul>
+      <li class="active"><a href="#general"><%= t('cloud_container.settings') %></a></li>
+      <li><a href="#files"><%= t('webpage.files') %></a></li>
+    </ul>
+
+    <div class="clearfix">
+
+  <div class="iox-content-padding">
+
+    <form data-bind="submit: saveItem" class="iox-form scrollable-content">
+
+      <div class="fields-header"><%= t('webpage.general') %></div>
+
+      <div class="field-box required">
+        <label for="name"><%= t('name') %></label>
+        <input type="text" name="webpage[name]" data-bind="value: name" required validationMessage="<%= t('webpage.name_required') %>" />
+      </div>
+
+    </form>
+
+  </div>
+
+</div>

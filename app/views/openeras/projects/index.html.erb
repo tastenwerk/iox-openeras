@@ -7,7 +7,6 @@
 
 <div class="iox-sidebar">
 
-  <!--<div class="iox-sidebar-arrow"></div>-->
   <div class="iox-sidebar-frame">
 
     <div class="iox-tree-control">
@@ -20,35 +19,59 @@
       </form>
     </div>
 
-    <ul id="iox-content-list"></ul>
+    <ul id="iox-content-list" class="openeras-labels-list"></ul>
 
   </div>
 
 </div>
 
 <div class="iox-content offset-sidebar">
-  <div class="iox-content-frame hide">
-    <div id="iox-content-details" class="iox-form" data-bind="template: { name: 'iox-content-form-template' }">
+
+  <div class="iox-content-frame">
+
+    <div class="iox-grid-header clearfix">
+      <a href="<%= new_project_path %>" class="new-project btn btn-success" data-tree-role="new" rel="tooltip"><%= t('openeras.project.new') %></a>
+      <div class="query-container">
+        <input type="text" class="query" name="query" autocomplete="off" />
+        <button class="clear-query"><i class="icon-remove"></i></button>
+        <button class="submit-query"><i class="icon-search"></i></button>
+      </div>
+      <div class="options-container">
+      </div>
     </div>
+
+    <div id="events-grid"></div>
+
   </div>
-  <div class="iox-details-placeholder">
-    <i class="icon-info-sign"></i>
-    <%= t('webpages.click_on_webpage_to_show_details') %>
-  </div>
+
+</div>
+
+<div class="iox-content offset-sidebar hide">
+  <%= render partial: 'form' %>
 </div>
 
 <script id="iox-tree-item-template" type="text/html">
   <li data-bind=" attr: { 'data-id': id, id: 'item_'+id }, click: markItem">
     <div class="item clearfix" data-bind=" css: { selected: _selected, hide: _hide }">
       <div class="actions">
-        <span class="color-ball" data-bind="attr: { class: color }"></span>
+        <a href="#" data-bind="click: removeItem" class="remove-item" title="<%= t('delete') %>">
+          <span class="icon-close"></span>
+        </a>
       </div>
+      <span class="color-ball" data-bind="attr: { class: color }"></span>
       <a class="title" data-bind="click: listContent, attr: { title: name }, text: name"></a>
     </div>
   </li>
 </script>
 
 <script type="text/javascript">
+
+  function selectedLabelId(){
+    $label = $('#iox-content-list .item.selected').closest('li')
+    if( $label.length )
+      return $label.attr('data-id')
+    return '';
+  }
 
   $(document).ready( function(){
 
@@ -71,34 +94,6 @@
            */
           listContent: function listContent( item, e ){
             console.log('list content');
-          },
-
-          /*
-           * show the webpage form (depending on the webpage's template)
-           * for editing existing webpages
-           */
-          showForm: function showForm( item, e ){
-            $('.iox-details-placeholder').hide();
-            $('.iox-content-frame').show();
-            setupItemForm( item );
-          },
-
-          /**
-           * save an existing webpage
-           */
-          saveItemForm: function saveItemForm( form ){
-            var self = this;
-            if( this._validator.validate() ){
-              $('.iox-content-frame').block();
-              $.ajax({ url: self._master.options.url+'/'+self.id, data: $(form).serializeArray(), dataType: 'json', type: 'put'
-              }).done( function( json ){
-                $('.iox-content-frame').unblock();
-                iox.flash.rails( json.flash );
-              });
-            } else {
-              iox.flash.notice('<%= t('please_fill_out_all_fields') %>');
-              return false;
-            }
           }
 
         },
@@ -135,8 +130,7 @@
                       $parentLi.find('.folder-spacer').addClass('open-folder').click();
                     }
                   } else
-                    self._master.items.push( item );
-                  setupItemForm( item );
+                    tree.items.push( item );
                 }
                 iox.flash.rails( json.flash );
               });
@@ -148,6 +142,144 @@
 
       }
     });
+
+    var kGrid = $("#events-grid").kendoGrid({
+      columns: [
+        { field: "published", title: "<span class='icon-check-circle'></span>", template: '<span class="publish-button #= published ? "icon-ok-sign" : "icon-ban-circle" #"></span>', width: 30 },
+        { field: "title", title: "<%= t('openeras.project.title') %>" },
+        { field: 'starts_at', title: '<%= t('openeras.project.starts_at') %>',
+          format: '{0:dd.MM.yyyy}',
+          width: 100
+        },
+        { field: 'ends_at', title: '<%= t('openeras.project.ends_at') %>',
+          format: '{0:dd.MM.yyyy}',
+          width: 100 },
+        { field: "venue_name",
+          title: "<%= t('openeras.project.venue_name') %>",
+          sortable: false
+        },
+        { field: 'updated_at',
+          title: "<%= t('updated_at') %>",
+          format: '{0:dd.MM.yyyy HH:mm}',
+          width: 120,
+          attributes: {
+            style: 'text-align: right'
+          }
+        },
+        { command:
+          [
+            { name: 'editProject',
+              text: '<i class="icon-edit"></i>',
+              click: function(e){
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                $('#iox-pe-content').hide();
+
+                var $newDtls = $('<div class="iox-details-container iox-content">').append( iox.loader );
+                $('.iox-content').after( $newDtls );
+                $('.iox-content').hide();
+                $newDtls.show().load( '/openeras/projects/'+dataItem.id+'/edit?layout=false', function(){
+                  setupPEEvents();
+                });
+              }
+            },
+            { name: 'deleteProject', text: '<i class="icon-remove"></i>',
+              click: function(e){
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                $.ajax({
+                  url: '<%= projects_path %>/'+ dataItem.id,
+                  type: 'delete',
+                  dataType: 'json'
+                }).done( function(json){
+                  iox.flash.rails(json.flash);
+                  if( json.success )
+                    kGrid.data('kendoGrid').removeRow( $(e.target).closest('tr') );
+                }).fail( function(json){
+                  iox.flash.rails(json.flash);
+                });
+              }
+            }
+          ],
+          width: 62
+        }
+      ],
+      dataSource: {
+        type: "json",
+        transport: {
+          read: {
+            url: "<%= projects_path %>",
+            dataType: 'json',
+            data: function(){
+              return { 'labels.id': selectedLabelId() };
+            }
+          }
+        },
+        schema: {
+          total: 'total',
+          data: function(response) {
+            return response.items;
+          },
+          model: {
+            fields: {
+              id: { type: 'number' },
+              published: { type: 'boolean' },
+              title: { type: 'string' },
+              venue_name: { type: 'string' },
+              starts_at: { type: 'date' },
+              ends_at: { type: 'date' },
+              updater_name: { type: 'string' },
+              updated_at: { type: 'date', width: 110 }
+            }
+          }
+        },
+        serverPaging: true,
+        serverFiltering: true,
+        serverSorting: true,
+        sort: { field: "updated_at", dir: "desc" }
+      },
+      height: $(window).height()-150,
+      selectable: "multiple",
+      resizable: true,
+      navigatable: true,
+      sortable: true,
+      pageable: {
+        refresh: true,
+        pageSize: 30,
+        pageSizes: [10, 30, 50, 100]
+      }
+    });
+
+    $(document).on('click', '.publish-button', function(){
+      var $elem = $(this);
+      var node = kGrid.data('kendoGrid').dataItem( $(this).closest('tr').get(0) );
+      node.published = !node.published;
+      $.ajax({ url: '/openeras/projects/'+node.id+'/publish?publish='+(node.published ? 'true' : 'false'),
+               type: 'put',
+               dataType: 'json',
+               data: { publish: $(this).hasClass('on') },
+               success: function( data ){
+                 iox.flash.rails( data.flash );
+                 if( data.success )
+                  if( data.item.published )
+                    $elem.addClass('icon-ok-sign').removeClass('icon-ban-circle');
+                  else
+                    $elem.removeClass('icon-ok-sign').addClass('icon-ban-circle');
+               }
+      });
+    });
+
+    $('.new-project.btn').on('click', function(e){
+      e.preventDefault();
+      iox.switchContent( 'next', function( $container ){
+        $container.block();
+        $.getJSON( '/openeras/projects/new?init_label_id='+selectedLabelId(), 
+          function(response){
+            ko.cleanNode( $container.get(0) );
+            ko.applyBindings( new ProjectModel( response ), $container.get(0) );
+            $container.unblock();
+        })
+      });
+    })
+
 
   });
 

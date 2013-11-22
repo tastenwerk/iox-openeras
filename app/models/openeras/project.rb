@@ -5,12 +5,15 @@ module Openeras
 
     acts_as_iox_document
 
-    attr_accessor :venue_id, :venue_name
+    attr_accessor :venue_id, :venue_name, :init_label_id
 
     belongs_to  :creator, class_name: 'Iox::User', foreign_key: 'created_by'
     belongs_to  :updater, class_name: 'Iox::User', foreign_key: 'updated_by'
     has_many    :events, -> { order(:starts_at) }, class_name: 'Openeras::Event', dependent: :delete_all
     has_many    :images, -> { order(:position) }, class_name: 'Openeras::File', dependent: :destroy
+
+    has_many    :labeled_items
+    has_many    :labels, through: :labeled_items
 
     validates   :title, presence: true, length: { in: 2..255 }
     validates   :subtitle, length: { maximum: 255 }
@@ -35,8 +38,7 @@ module Openeras
       h = super(options)
       h[:venue_id] = venue_id
       h[:venue_name] = venue_name
-      h[:ensemble_name] = ensemble_name
-      h[:updater_name] = updater ? updater.full_name : ( creator ? creator.full_name : ( import_foreign_db_name.blank? ? '' : import_foreign_db_name ) )
+      h[:updater_name] = updater ? updater.full_name : ( creator ? creator.full_name : '' )
       h
     end
 

@@ -8,109 +8,110 @@ module Openeras
 
       return unless request.xhr?
 
-      @query = ''
+      @query = Project.where('')
       filter = (params[:filter] && params[:filter][:filters] && params[:filter][:filters]['0'] && params[:filter][:filters]['0'][:value]) || ''
       unless filter.blank?
         filter = filter.downcase
         if filter.match(/^[\d]*$/)
-          @query = "iox_program_entries.import_foreign_db_id LIKE '#{filter}%' OR iox_program_entries.id =#{filter}"
+          @query = @query.where('project.id' => filter)
         else
-          @query = "LOWER(title) LIKE '%#{filter}%' OR LOWER(subtitle) LIKE '%#{filter}%' OR LOWER(iox_program_entries.meta_keywords) LIKE '%#{filter}%'"
+          @query = @query.where "LOWER(title) LIKE ? OR LOWER(subtitle) LIKE ? OR LOWER(openeras_projects.meta_keywords) LIKE ?", 
+                                "%#{filter}",
+                                "%#{filter}",
+                                "%#{filter}"
         end
       end
 
-      @only_mine = !params[:only_mine] || params[:only_mine] == 'true'
-      @conflict = params[:conflict] && params[:conflict] == 'true'
-      @future_only = params[:future_only] && params[:future_only] == 'true'
-      @only_unpublished = params[:only_unpublished] && params[:only_unpublished] == 'true'
-      @q = "only_mine=#{@only_mine}&future_only=#{@future_only}&only_unpublished=#{@only_unpublished}&query=#{filter}"
-      if @future_only
-        @query << " AND " if @query.size > 0
-        @query << " iox_program_entries.ends_at >= '#{Time.now.strftime('%Y-%m-%d')}'"
+      # conflict_id
+      if params[:conflict_id] && !params[:conflict_id].blank?
+        @query = @query.where "openeras_projects.conflict_id" => params[:conflict_id]
       end
-      if @only_mine
-        @query << " AND " if @query.size > 0
-        @query << " iox_program_entries.created_by = #{current_user.id}"
+
+      # starts_at
+      if params[:starts_at] && !params[:starts_at].blank?
+        begin
+          @query = @query.where "openeras_projects.starts_at >= ?", Time.parse( params[:starts_at] )
+        rescue => e
+          if e.message.include? "no time information"
+            @query = @query.where "openeras_projects.starts_at >= ?", Time.now
+          else
+            raise e
+          end
+        end
       end
-      if @conflict
-        @query << " AND " if @query.size > 0
-        @query << " (iox_program_entries.conflict IS TRUE OR iox_program_entries.conflict_id IS NOT NULL)"
+
+      # published?
+      if params[:published] && !params[:published].blank?
+        @query = @query.where "openeras_projects.published" => (params[:published] == 'true')
       end
-      if @only_unpublished
-        @query << " AND " if @query.size > 0
-        @query << " iox_program_entries.published = false"
-      end
-      @total_items = ProgramEntry.where( @query ).count
+
+      # setup full query
+      @query = @query.includes(:updater).references(:iox_users)
+
+      @total_items = @query.count
+
       @page = (params[:skip] || 0).to_i
       @page = @page / params[:pageSize].to_i if @page > 0 && params[:pageSize]
       @limit = (params[:take] || 20).to_i
       @total_pages = @total_items/@limit
       @total_pages += 1 if ((@total_items % @limit) > 0)
 
-      @order = 'iox_program_entries.id'
+      @order = 'openeras_projects.created_at DESC'
       if params[:sort]
         sort = params[:sort]['0'][:field]
         unless sort.blank?
-          sort = "iox_program_entries.#{sort}" if sort.match(/id|created_at|updated_at|starts_at|ends_at/)
+          sort = "openeras_projects.#{sort}" if sort.match(/id|created_at|updated_at|starts_at|ends_at/)
           sort = "LOWER(title)" if sort === 'title'
-          sort = "LOWER(iox_ensembles.name)" if sort == 'ensemble_name'
           sort = "LOWER(iox_users.username)" if sort == 'updater_name'
           @order = "#{sort} #{params[:sort]['0'][:dir]}"
         end
       end
 
-      @program_entries = ProgramEntry.where( @query ).includes(:ensemble).includes(:updater).references(:iox_ensembles,:iox_users).limit( @limit ).offset( (@page) * @limit ).order(@order).load.map do |pe|
-        pe.venue_id = ''
-        pe.venue_name = ''
-        pe.ensemble_name = ''
-        if pe.events.size > 0 && pe.events.first.venue
-          pe.venue_id = pe.events.first.venue.id
-          pe.venue_name = pe.events.first.venue.name
-        end
-        if pe.ensemble
-          pe.ensemble_name = pe.ensemble.name
-        end
-        pe
-      end
+      @projects = @query.limit( @limit ).offset( (@page) * @limit ).order(@order).load
 
-      render json: { items: @program_entries, total: @total_items, order: @order }
+      render json: { items: @projects, total: @total_items, order: @order }
 
     end
 
+    def new
+      @project = Project.new init_label_id: params[:init_label_id]
+      render json: @project
+    end
+
     def create
-      @program_entry = ProgramEntry.new entry_params
+      @project = Project.new entry_params
       @layout = true
       if current_user.is_admin? && params[:with_user]
-        @program_entry.created_by = params[:with_user]
+        @project.created_by = params[:with_user]
       else
-        @program_entry.created_by = current_user.id
+        @project.created_by = current_user.id
       end
 
-      if @program_entry.save
+      if @project.save
         begin
-          Iox::Activity.create! user_id: current_user.id, obj_name: @program_entry.title, action: 'created', icon_class: 'icon-calendar', obj_id: @program_entry.id, obj_type: @program_entry.class.name, obj_path: program_entries_path(@program_entry)
+          Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: 'created', icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: program_entries_path(@project)
         rescue
         end
 
-        flash.now.notice = t('program_entry.created')
+        flash.now.notice = t('project.created')
         @proceed_to_step = 1
         render template: 'iox/program_entries/edit'
       else
-        flash.now.alert = t('program_entry.failed_to_save')
+        flash.now.alert = t('project.failed_to_save')
         render template: 'iox/program_entries/new'
       end
     end
 
     def update
       if check_404_and_privileges
-        @program_entry.updated_by = current_user.id
-        if @program_entry.update entry_params
+        @project.updated_by = current_user.id
+        if @project.update entry_params
 
-          Iox::Activity.create! user_id: current_user.id, obj_name: @program_entry.title, action: 'updated', icon_class: 'icon-calendar', obj_id: @program_entry.id, obj_type: @program_entry.class.name, obj_path: program_entries_path(@program_entry)
+          Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: 'updated', icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: program_entries_path(@project)
 
-          flash.now.notice = t('program_entry.saved')
+          flash.now.notice = t('project.saved')
         else
-          flash.now.alert = t('program_entry.failed_to_save')
+          flash.now.alert = t('project.failed_to_save')
         end
       else
         flash.now.alert = t('not_found')
@@ -118,11 +119,11 @@ module Openeras
     end
 
     def finish
-      if @program_entry = ProgramEntry.find_by_id( params[:id] )
-        if @program_entry.update params.require(:program_entry).permit(:published, :others_can_change, :notify_me_on_change)
-          flash.notice = t('program_entry.saved')
+      if @project = Project.find_by_id( params[:id] )
+        if @project.update params.require(:project).permit(:published, :others_can_change, :notify_me_on_change)
+          flash.notice = t('project.saved')
         else
-          flash.alert = t('program_entry.failed_to_save')
+          flash.alert = t('project.failed_to_save')
         end
       else
         flash.alert = t('not_found')
@@ -131,31 +132,31 @@ module Openeras
     end
 
     #
-    # publish a program_entry
+    # publish a project
     #
     def publish
       if check_404_and_privileges
         if params[:publish] == "true"
-          @program_entry.published = true
+          @project.published = true
         else
-          @program_entry.published = false
+          @project.published = false
         end
-        if @program_entry.save
+        if @project.save
           @published = false
-          if @program_entry.published?
+          if @project.published?
             @published = true
-            flash.now.notice = t('program_entry.has_been_published', name: @program_entry.title)
+            flash.now.notice = t('project.has_been_published', name: @project.title)
           else
-            flash.now.notice = t('program_entry.has_been_unpublished', name: @program_entry.title)
+            flash.now.notice = t('project.has_been_unpublished', name: @project.title)
           end
 
-          Iox::Activity.create! user_id: current_user.id, obj_name: @program_entry.title, action: (@published ? 'published' : 'unpublished'), icon_class: 'icon-calendar', obj_id: @program_entry.id, obj_type: @program_entry.class.name, obj_path: program_entries_path(@program_entry)
+          Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: (@published ? 'published' : 'unpublished'), icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: program_entries_path(@project)
 
         else
           flash.now.alert = 'unknown error'
         end
       end
-      render :json => { flash: flash, item: @program_entry, success: !flash.notice.blank? }
+      render :json => { flash: flash, item: @project, success: !flash.notice.blank? }
     end
 
     def edit
@@ -167,8 +168,8 @@ module Openeras
     end
 
    def crew_of
-      @program_entry = ProgramEntry.find_by_id( params[:id] )
-      @crew = @program_entry.program_entry_people.includes(:person).references(:iox_people).order('iox_program_entry_people.position','iox_people.lastname','iox_people.firstname').load
+      @project = Project.find_by_id( params[:id] )
+      @crew = @project.project_people.includes(:person).references(:iox_people).order('iox_project_people.position','iox_people.lastname','iox_people.firstname').load
       json_crew = []
       @crew.each do |person|
         unless person.person
@@ -181,15 +182,15 @@ module Openeras
     end
 
     def events_for
-      @program_entry = ProgramEntry.find_by_id( params[:id] )
+      @project = Project.find_by_id( params[:id] )
       events = []
-      @program_entries = @program_entry.events.includes(:venue,:festival).references(:iox_venues,:iox_program_entries).order('iox_program_events.starts_at').load
+      @program_entries = @project.events.includes(:venue,:festival).references(:iox_venues,:projects).order('iox_program_events.starts_at').load
       render json: @program_entries
     end
 
     def images_for
-      if @program_entry = ProgramEntry.find_by_id( params[:id] )
-        render json: @program_entry.images.map{ |i| i.to_jq_upload('file') }
+      if @project = Project.find_by_id( params[:id] )
+        render json: @project.images.map{ |i| i.to_jq_upload('file') }
       else
         logger.error "program entry not found (#{params[:id]})"
         render json: []
@@ -203,13 +204,13 @@ module Openeras
         filter = filter.downcase
         @query = "LOWER(title) LIKE '%#{filter}%'"
       end
-      @festivals = ProgramEntry.where(categories: 'fes').where( @query ).order(:title).load
+      @festivals = Project.where(categories: 'fes').where( @query ).order(:title).load
       render json: @festivals
     end
 
     def upload_image
-      if @program_entry = ProgramEntry.find_by_id( params[:id] )
-        @image = @program_entry.images.build(
+      if @project = Project.find_by_id( params[:id] )
+        @image = @project.images.build(
           name: (params[:name].blank? ? params[:image][:file].original_filename : params[:name]),
           description: params[:description],
           copyright: params[:copyright]
@@ -228,7 +229,7 @@ module Openeras
     end
 
     def download_image_from_url
-      if @program_entry = ProgramEntry.find_by_id( params[:id] )
+      if @project = Project.find_by_id( params[:id] )
         extname = File.extname(params[:download_url])
         basename = File.basename(params[:download_url], extname)
         file = Tempfile.new([basename, extname])
@@ -238,7 +239,7 @@ module Openeras
         end
         file.rewind
 
-        @image = @program_entry.images.build(
+        @image = @project.images.build(
           name: (params[:name].blank? ? basename : params[:name]),
           description: params[:description],
           copyright: params[:copyright]
@@ -257,11 +258,11 @@ module Openeras
     end
 
     def order_images
-      if @program_entry = ProgramEntry.find_by_id( params[:id] )
+      if @project = Project.find_by_id( params[:id] )
         if params[:order]
           errors = 0
           params[:order].split(',').each_with_index do |img_id, pos|
-            @image = @program_entry.images.where( id: img_id.sub('image_','') ).first
+            @image = @project.images.where( id: img_id.sub('image_','') ).first
             @image.position = pos
             errors += 1 unless @image.save
           end
@@ -278,18 +279,18 @@ module Openeras
     end
 
     def order_crew
-      if @program_entry = ProgramEntry.find_by_id( params[:id] )
+      if @project = Project.find_by_id( params[:id] )
         if params[:order]
           errors = 0
           params[:order].split(',').each_with_index do |crew_id, pos|
-            @pe_person = @program_entry.program_entry_people.where( id: crew_id.sub('crew_','') ).first
+            @pe_person = @project.project_people.where( id: crew_id.sub('crew_','') ).first
             @pe_person.position = pos
             errors += 1 unless @pe_person.save
           end
           if errors == 0
-            flash.now.notice = t('program_entry.order_saved')
+            flash.now.notice = t('project.order_saved')
           else
-            flash.now.alert = t('program_entry.order_failed')
+            flash.now.alert = t('project.order_failed')
           end
         end
       else
@@ -300,13 +301,13 @@ module Openeras
 
     def destroy
       if check_404_and_privileges
-        if @program_entry.delete
+        if @project.delete
 
-        Iox::Activity.create! user_id: current_user.id, obj_name: @program_entry.title, action: 'deleted', icon_class: 'icon-calendar', obj_id: @program_entry.id, obj_type: @program_entry.class.name, obj_path: program_entries_path(@program_entry)
+        Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: 'deleted', icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: program_entries_path(@project)
 
-          flash.now.notice = t('program_entry.deleted', name: @program_entry.title, id: @program_entry.id )
+          flash.now.notice = t('project.deleted', name: @project.title, id: @project.id )
         else
-          flash.now.alert = t('program_entry.deletion_failed', name: @program_entry.title)
+          flash.now.alert = t('project.deletion_failed', name: @project.title)
         end
       end
       render json: { success: !flash[:notice].blank?, flash: flash }
@@ -314,13 +315,13 @@ module Openeras
 
     def restore
       if check_404_and_privileges
-        if @program_entry.restore
+        if @project.restore
 
-          Iox::Activity.create! user_id: current_user.id, obj_name: @program_entry.title, action: 'restored', icon_class: 'icon-calendar', obj_id: @program_entry.id, obj_type: @program_entry.class.name, obj_path: program_entries_path(@program_entry)
+          Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: 'restored', icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: program_entries_path(@project)
 
-          flash.now.notice = t('program_entry.restored', name: @program_entry.title)
+          flash.now.notice = t('project.restored', name: @project.title)
         else
-          flash.now.alert = t('program_entry.failed_to_restore', name: @program_entry.title)
+          flash.now.alert = t('project.failed_to_restore', name: @project.title)
         end
       end
     end
@@ -328,7 +329,7 @@ module Openeras
     private
 
     def entry_params
-      params.require(:program_entry).permit([
+      params.require(:project).permit([
         :title, :subtitle,
         :description, :age,
         :duration, :ensemble_id,
@@ -354,7 +355,7 @@ module Openeras
 
     def check_404_and_privileges(hard_check=false)
       @insufficient_rights = true
-      unless @program_entry = ProgramEntry.unscoped.where( id: params[:id] ).first
+      unless @project = Project.unscoped.where( id: params[:id] ).first
         if request.xhr?
           flash.now.alert = t('not_found')
         else
@@ -364,7 +365,7 @@ module Openeras
         return false
       end
 
-      if !current_user.is_admin? && @program_entry.created_by != current_user.id && (!@program_entry.others_can_change || hard_check)
+      if !current_user.is_admin? && @project.created_by != current_user.id && (!@project.others_can_change || hard_check)
         if request.xhr?
           flash.now.alert = t('insufficient_rights_you_cannot_save')
         else

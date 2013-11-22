@@ -5,6 +5,8 @@ MiniOpeneras::Engine.routes.draw do
       get :labels, to: 'labels#project_labels'
     end
   end
+  
+  delete '/projects/labels/:id', to: 'labels#destroy'
 
   resources :labels
 

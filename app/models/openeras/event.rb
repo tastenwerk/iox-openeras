@@ -6,6 +6,9 @@ module Openeras
     belongs_to  :creator, class_name: 'Iox::User', foreign_key: 'created_by'
     belongs_to  :updater, class_name: 'Iox::User', foreign_key: 'updated_by'
 
+    has_many    :labeled_items
+    has_many    :labels, through: :labeled_items
+
     attr_accessor :starts_at_time, :ends_at_time
 
     before_save :update_start_end_time

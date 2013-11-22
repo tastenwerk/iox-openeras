@@ -22,6 +22,19 @@ module Openeras
       load_for(:project)
     end
 
+    def destroy
+      if @label = Label.find_by_id( params[:id] )
+        if @label.destroy
+          flash.now.notice = t('deleted', name: @label.name)
+        else
+          flash.now.alert = t('deletion_failed', name: @label.name)
+        end
+      else
+        flash.now.alert = t('not_found')
+      end
+      render json: { item: @label, success: params[:alert].blank?, flash: flash }
+    end
+
     private
 
     def load_for( category )

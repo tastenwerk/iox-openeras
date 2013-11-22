@@ -19,9 +19,9 @@ class CreateOpenerasVenues < ActiveRecord::Migration
       t.float           :lat
       t.float           :lng
 
-      t.integer         :created_by
-
+      t.iox_document_defaults
       t.timestamps
+
     end
   end
 end

@@ -8,3 +8,12 @@ de:
   openeras:
     label:
       new: "Neues Label"
+
+    project:
+      new: "Neues Projekt"
+      title: "Projekttitel"
+      subtitle: "Untertitel"
+      author: "Autor(en)"
+      starts_at: "Beginnt"
+      ends_at: "Endet"
+      venue_name: "Spielort"

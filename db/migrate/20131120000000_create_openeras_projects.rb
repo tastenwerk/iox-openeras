@@ -5,7 +5,6 @@ class CreateOpenerasProjects < ActiveRecord::Migration
       t.string          :title, index: true
       t.string          :subtitle
 
-      t.boolean         :conflict, default: false
       t.integer         :conflict_id
 
       t.date            :starts_at, index: true
@@ -30,10 +29,8 @@ class CreateOpenerasProjects < ActiveRecord::Migration
       t.integer         :age
 
       t.iox_document_defaults
-
-      t.belongs_to      :label
-
       t.timestamps
+      
     end
   end
 end
