@@ -3,6 +3,12 @@ module Openeras
 
     before_filter :authenticate!
 
+    def index
+      @project = Project.find_by_id params[:project_id]
+      @events = @project.events
+      render json: { items: @events, total: @events.size }
+    end
+
     def create
       @program_event = ProgramEvent.new program_event_params
       @program_event.reductions = params[:program_event][:reductions_arr].join(',') if params[:program_event][:reductions_arr] && params[:program_event][:reductions_arr].size > 0

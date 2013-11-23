@@ -12,10 +12,6 @@ class CreateOpenerasProjects < ActiveRecord::Migration
 
       t.text            :url
 
-      t.text            :description
-
-      t.text            :meta_keywords
-
       t.integer         :organizer_id
       t.string          :coproduction
 

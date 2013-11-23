@@ -3,7 +3,8 @@ class CreateOpenerasLabels < ActiveRecord::Migration
     create_table :openeras_labels do |t|
 
       t.string      :name
-      t.string      :category
+      t.integer     :parent_id
+      t.string      :type
 
       t.iox_document_defaults
 

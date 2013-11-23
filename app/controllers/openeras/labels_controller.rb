@@ -4,9 +4,11 @@ module Openeras
 
   class LabelsController < Iox::ApplicationController
 
+    before_filter :authenticate!
+    
     def create
       if params[:name] && params[:name].size > 0
-        @label = Label.new name: params[:name], category: params[:category]
+        @label = Label.new name: params[:name], type: params[:type]
         if @label.save
           flash.now.notice = t('saved', name: @label.name)
         else
@@ -18,8 +20,12 @@ module Openeras
       render json: { item: @label, success: flash[:alert].blank?, flash: flash }
     end
 
-    def project_labels
-      load_for(:project)
+    def projects
+      load_for ProjectLabel.where('')
+    end
+
+    def people
+      load_for PersonLabel.where('')
     end
 
     def destroy
@@ -37,8 +43,15 @@ module Openeras
 
     private
 
-    def load_for( category )
-      q = Label.where(category: category)
+    def load_for( q )
+      if params[:query] && !params[:query].blank?
+        q = q.where("name LIKE ?", "%#{params[:query]}%")
+      end
+      if params[:parent_id] && !params[:parent_id].blank?
+        q = q.where(parent_id: params[:parent_id])
+      else
+        q = q.where("parent_id IS NULL")
+      end
       render json: { items: q.load }
     end
     

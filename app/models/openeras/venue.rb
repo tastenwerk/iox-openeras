@@ -2,7 +2,6 @@ module Openeras
   class Venue < ActiveRecord::Base
 
     acts_as_iox_document
-    include Iox::FileObject
 
     default_scope { where( deleted_at: nil ) }
 
@@ -13,7 +12,7 @@ module Openeras
 
     has_many    :images, -> { order(:position) }, class_name: 'Openeras::File', dependent: :destroy
 
-    has_many    :labeled_items
+    has_many    :labeled_items, dependent: :destroy
     has_many    :labels, through: :labeled_items
 
     validates :name, presence: true

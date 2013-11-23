@@ -1,4 +1,5 @@
 <%= content_for :add_js do %>
+  <script type="text/javascript" src="/javascripts/3rdparty/ckeditor/ckeditor.js"></script>
   <%= javascript_include_tag "openeras/common" %>
 <% end %>
 <%= content_for :add_css do %>
@@ -7,9 +8,9 @@
 
 <div class="iox-sidebar">
 
-  <div class="iox-sidebar-frame">
-
-    <div class="iox-tree-control">
+  <div class="iox-sidebar-frame half-top">
+  <h3 class="iox-sidebar-title"><%= t('openeras.labels.title') %></h3>
+    <div class="labels-list-control iox-tree-control">
       <form>
         <input type="text" name="query" placeholder="<%= t('filter_results') %> " />
         <input type="submit" value="<%= t('search') %>" />
@@ -19,7 +20,22 @@
       </form>
     </div>
 
-    <ul id="iox-content-list" class="openeras-labels-list"></ul>
+    <ul id="labels-list" class="openeras-labels-list"></ul>
+
+  </div>
+
+  <div class="iox-sidebar-frame half-bottom">
+    <h3 class="iox-sidebar-title"><%= t('openeras.venues.title') %></h3>
+    <div class="venues-list-control iox-tree-control">
+      <form>
+        <input type="text" name="query" placeholder="<%= t('filter_results') %> " />
+        <input type="submit" value="<%= t('search') %>" />
+        <a href="#" data-tree-role="search" title="<%= t('filter_results') %>"><i class="icon-search"></i></a>
+        <a href="#" data-tree-role="refresh" title="<%= t('refresh') %>"><i class="icon-refresh"></i></a>
+      </form>
+    </div>
+
+    <ul id="venues-list" class="openeras-venues-list"></ul>
 
   </div>
 
@@ -40,7 +56,7 @@
       </div>
     </div>
 
-    <div id="events-grid"></div>
+    <div id="events-grid" class="iox-k-grid"></div>
 
   </div>
 
@@ -67,7 +83,7 @@
 <script type="text/javascript">
 
   function selectedLabelId(){
-    $label = $('#iox-content-list .item.selected').closest('li')
+    $label = $('#labels-list .item.selected').closest('li')
     if( $label.length )
       return $label.attr('data-id')
     return '';
@@ -75,10 +91,16 @@
 
   $(document).ready( function(){
 
-    $('#iox-content-list').ioxTree({
-      url: '/openeras/projects/labels',
+
+    /**
+     * ---------------------------------------------------------
+     * labels
+     * ---------------------------------------------------------
+     */
+    $('#labels-list').ioxTree({
+      url: '/openeras/labels/projects',
       observe: ['name', 'color'],
-      control: $('.iox-tree-control'),
+      control: $('.labels-list-control'),
       i18n:{
         noEntriesFound: '<%= t('filter_no_entries_found') %>'
       },
@@ -112,7 +134,7 @@
 
               $.ajax({ 
                 url: '/openeras/labels', 
-                data: { name: name, category: 'project' }, 
+                data: { name: name, type: 'Openeras::ProjectLabel' }, 
                 dataType: 'json', 
                 type: 'post' 
               }).done( function( json ){
@@ -137,6 +159,42 @@
 
             }
           }
+
+        }
+
+      }
+    });
+
+
+    /**
+     * ---------------------------------------------------------
+     * venues
+     * ---------------------------------------------------------
+     */
+    $('#venues-list').ioxTree({
+      url: '/openeras/venues',
+      observe: ['name', 'color'],
+      control: $('.venues-list-control'),
+      i18n:{
+        noEntriesFound: '<%= t('filter_no_entries_found') %>'
+      },
+      events: {
+        afterRemove: function afterRemove( item ){
+          $('.iox-details-placeholder').show();
+          $('.iox-content-frame').hide();
+        },
+        item: {
+
+          /**
+           * lists content of this item in a grid
+           */
+          listContent: function listContent( item, e ){
+            console.log('list content');
+          }
+
+        },
+
+        tree: {
 
         }
 
@@ -172,13 +230,8 @@
               text: '<i class="icon-edit"></i>',
               click: function(e){
                 var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-                $('#iox-pe-content').hide();
-
-                var $newDtls = $('<div class="iox-details-container iox-content">').append( iox.loader );
-                $('.iox-content').after( $newDtls );
-                $('.iox-content').hide();
-                $newDtls.show().load( '/openeras/projects/'+dataItem.id+'/edit?layout=false', function(){
-                  setupPEEvents();
+                iox.switchContent( 'next', function( $container ){
+                  setupContainer( ko.toJS(dataItem), $container );
                 });
               }
             },
@@ -199,7 +252,7 @@
               }
             }
           ],
-          width: 62
+          width: 90
         }
       ],
       dataSource: {
@@ -267,16 +320,19 @@
       });
     });
 
+    /**
+     * show new form above current grid
+     *
+     */
     $('.new-project.btn').on('click', function(e){
       e.preventDefault();
       iox.switchContent( 'next', function( $container ){
         $container.block();
         $.getJSON( '/openeras/projects/new?init_label_id='+selectedLabelId(), 
-          function(response){
-            ko.cleanNode( $container.get(0) );
-            ko.applyBindings( new ProjectModel( response ), $container.get(0) );
+          function( response ){
+            setupContainer( response, $container );
             $container.unblock();
-        })
+        });
       });
     })
 

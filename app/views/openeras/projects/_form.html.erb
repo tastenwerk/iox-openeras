@@ -1,35 +1,112 @@
-<div class="iox-content-frame auto-overflow">
+<div class="iox-content-frame auto-overflow" data-bind="template: { name: 'project-tmpl' }"></div>
 
-  <%= render partial: '/iox/common/form_control', locals: { item_ns: 'openeras.project', item_url: '/openeras/projects' } %>
+<script type="text/html" id="project-tmpl">
+
+  <div class="iox-form-control">
+
+    <% if can_write_plugin?( 'openeras' ) %>
+      <a data-bind="attr: { href: '/openeras/projects/'+id }, click: removeItem" class="btn" title="<%= t('delete') %>" data-confirm-proceed="<%= t('really_delete') %>"><span class="icon-trash-o"></span></a>
+      
+      <a href="#" data-xhr-win="true" data-bind="attr: { 'data-xhr-href': '/openeras/projects/preferences'}
+      " class="btn"><i class="icon-gear"></i></a>
+
+      <a href="#" data-role="switchBackContent" class="btn"><i class="icon-arrow-circle-left"></i></a>
+
+      <a href="#" data-bind="click: saveItem" class="btn btn-primary" title="<%= t('save') %>"><span class="icon-save"></span>&nbsp; <%= t('save') %></a>
+
+    <% end %>
+
+  </div>
 
   <div class="webpage-head-control iox-form-control">
 
-    <a class="btn" data-bind=" attr: { href: '/openeras/projects/'+id }" rel="tooltip" title="<%= t("#{controller.controller_name.singularize}.view") %>"><i class="icon-eye icon"></i></a>
+    <a class="btn" data-bind=" attr: { href: '/openeras/projects/'+id }" title="<%= t("openeras.project.view") %>"><i class="icon-eye icon"></i></a>
 
   </div>
 
-  <div class="iox-tabs">
+  <div class="iox-tabs openeras-project-tabs">
 
     <ul>
-      <li class="active"><a href="#general"><%= t('cloud_container.settings') %></a></li>
-      <li><a href="#files"><%= t('webpage.files') %></a></li>
+      <li class="active"><a href="#general"><%= t('openeras.project.general') %></a></li>
+      <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#content"><%= t('openeras.project.text_and_langs') %></a></li>
+      <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#dates"><%= t('openeras.project.dates') %></a></li>
+      <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#files"><%= t('openeras.project.files') %></a></li>
     </ul>
 
-    <div class="clearfix">
+    <div class="clearfix iox-content-padding">
 
-  <div class="iox-content-padding">
+      <form data-bind="submit: saveItem" class="iox-form openeras-project-form scrollable-content">
 
-    <form data-bind="submit: saveItem" class="iox-form scrollable-content">
+        <div class="field-box w-input required">
+          <label for="title"><%= t('openeras.project.title') %></label>
+          <input type="text" name="project[title]" data-bind="value: title" required validationMessage="<%= t('openeras.project.title_required') %>" />
+        </div>
 
-      <div class="fields-header"><%= t('webpage.general') %></div>
+        <div class="field-box w-input">
+          <label for="subtitle"><%= t('openeras.project.subtitle') %></label>
+          <input type="text" name="project[subtitle]" data-bind="value: subtitle" />
+        </div>
 
-      <div class="field-box required">
-        <label for="name"><%= t('name') %></label>
-        <input type="text" name="webpage[name]" data-bind="value: name" required validationMessage="<%= t('webpage.name_required') %>" />
-      </div>
+        <div class="field-box w-input">
+          <label for="title"><%= t('openeras.project.authors') %></label>
+          <input type="text" name="project[authors]" class="project-authors select2" data-bind="value: author_names" />
+        </div>
 
-    </form>
+        <div class="desc">
+          <label style="color: red">*</label> <%= t('required_field') %>
+        </div>
+
+        <input type="submit" class="hide" />
+
+      </form>
+
+    </div>
+
+
+    <div class="clearfix iox-content-padding hide">
+
+      <form data-bind="submit: saveTranslation" class="iox-form openeras-project-form scrollable-content">
+
+        <div class="field-box">
+          <label for="content"><%= t('openeras.project.lang') %></label>
+          <select data-bind="options: available_locales, selectedOptions: locale"></select>
+        </div>
+
+        <div class="field-box w-input">
+          <label for="content"><%= t('openeras.project.body') %></label>
+          <textarea name="translation[content]" class="editor" data-bind="value: translation().content"></textarea>
+        </div>
+
+        <div class="fields-header"><%= t('openeras.meta_information') %></div>
+
+        <div class="field-box w-input">
+          <label for="meta_description"><%= t('openeras.project.meta_description') %></label>
+          <textarea data-bind="value: translation().meta_description"></textarea>
+          <div class="desc label-offset"><%= t('openeras.project.meta_description_desc') %></div>
+        </div>
+
+        <div class="field-box w-input">
+          <label for="meta_keywords"><%= t('openeras.project.meta_keywords') %></label>
+          <input type="text" class="project-meta-keywords select2" data-bind="value: translation().meta_keywords" />
+          <div class="desc label-offset"><%= t('openeras.project.meta_keywords_desc') %></div>
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="clearfix iox-content-padding hide">
+
+      <div id="dates-grid" class="iox-k-grid"></div>
+
+    </div>
+
+    <div class="clearfix iox-content-padding hide">
+
+      <h1>files</h1>
+
+    </div>
 
   </div>
 
-</div>
+</script>

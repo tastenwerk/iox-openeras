@@ -1,13 +1,17 @@
 MiniOpeneras::Engine.routes.draw do
 
   resources :projects do
+    resources :events
+  end
+
+  resources :people
+  resources :venues
+  
+  resources :labels do
     collection do
-      get :labels, to: 'labels#project_labels'
+      get :projects
+      get :people
     end
   end
-  
-  delete '/projects/labels/:id', to: 'labels#destroy'
-
-  resources :labels
 
 end

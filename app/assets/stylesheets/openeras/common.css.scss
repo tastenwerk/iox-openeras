@@ -18,3 +18,18 @@
 .openeras-labels-list .item:hover .remove-item{
   visibility: visible;
 }
+
+.openeras-project-form .select2{
+  width: 400px;
+}
+
+.openeras-project-form .select2-container-multi .select2-choices{
+  background: none;
+  border-color: #ccc;
+  padding: 5px;
+}
+
+.openeras-project-form .cke_chrome{
+  margin-left: 140px;
+  max-width: 700px;
+}

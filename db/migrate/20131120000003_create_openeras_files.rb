@@ -10,6 +10,7 @@ class CreateOpenerasFiles < ActiveRecord::Migration
 
       t.belongs_to  :project
       t.belongs_to  :venue
+      t.belongs_to  :person
 
       t.timestamps
 

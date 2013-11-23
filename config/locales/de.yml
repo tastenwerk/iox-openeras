@@ -1,11 +1,17 @@
 de:
   projects:
-    title: "Projekte"
-
-  venues:
-    title: "Spielorte"
+    title: "Veranstaltungen / Termine"
 
   openeras:
+
+    meta_information: "Meta Informationen (Suchmaschinen)"
+
+    venues:
+      title: "Spielorte"
+
+    labels:
+      title: "Kategorien"
+
     label:
       new: "Neues Label"
 
@@ -13,7 +19,32 @@ de:
       new: "Neues Projekt"
       title: "Projekttitel"
       subtitle: "Untertitel"
-      author: "Autor(en)"
+      authors: "Autor(en)"
+      meta_description: "Kurzbeschreibung"
+      meta_description_desc: "Diese Beschreibung wird bei Kurzinfos und von Suchmaschinen verwendet. Maximal 255 Zeichen"
+      meta_keywords: "Schlagwörter"
+      meta_keywords_desc: "Werden bei der Suche und von manchen Suchmaschinen berücksichtigt und zur feineren Kategorisierung verwendet"
       starts_at: "Beginnt"
       ends_at: "Endet"
       venue_name: "Spielort"
+      view: "Ansicht in Website"
+      title_required: "Projekttitel ist Pflichtfeld"
+
+      general: "Allgemein"
+      dates: "Termine"
+      location: "Spielort"
+      files: "Medienmaterial"
+
+      text_and_langs: "Text und Sprachen"
+      body: "Textkörper"
+
+      lang: "Sprache"
+
+      not_saved_yet_save_q: "Soll das Projekt gleich gespeichert werden?"
+
+      has_been_published: "Projekt &raquo;%{name}&laquo; wurde veröffentlicht"
+      has_been_unpublished: "Veröffentlichung von &raquo;%{name}&laquo; wurde zurückgezogen"
+      delete: "Projekt löschen"
+      deleted: "Projekt &raquo;%{name}&laquo; wurde gelöscht <a href='/openeras/projects/%{id}/restore' data-method='post' data-remote='true'><i class='flash-icon icon-undo'></i>Wiederherstellen</a>"
+    
+      dates: "Termine"

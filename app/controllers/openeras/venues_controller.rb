@@ -1,59 +1,17 @@
 require_dependency "iox/application_controller"
 
 module Openeras
-  class VenuesController < Iox::ApplicationController
+  class VenuesController < Openeras::ApplicationController
 
     before_filter :authenticate!
 
     def index
 
-      return unless request.xhr?
-
-      @query = ''
-      filter = (params[:filter] && params[:filter][:filters] && params[:filter][:filters]['0'] && params[:filter][:filters]['0'][:value]) || ''
-      unless filter.blank?
-        filter = filter.downcase
-        if filter.match(/^[\d]*$/)
-          @query = "iox_venues.import_foreign_db_id LIKE '#{filter}%' OR iox_venues.id =#{filter}"
-        else
-          @query = "LOWER(iox_venues.name) LIKE '%#{filter}%' OR LOWER(iox_venues.city) LIKE '%#{filter}%' OR LOWER(iox_venues.meta_keywords) LIKE '%#{filter}%'"
-        end
+      q = Venue.where('')
+      if params[:query] && !params[:query].blank?
+        q = q.where("name LIKE ?", "%#{params[:query]}%")
       end
-
-      @only_mine = !params[:only_mine] || params[:only_mine] == 'true'
-      @conflict = params[:conflict] && params[:conflict] == 'true'
-      @future_only = params[:future_only] && params[:future_only] == 'true'
-      @only_unpublished = params[:only_unpublished] && params[:only_unpublished] == 'true'
-      @q = "only_mine=#{@only_mine}&future_only=#{@future_only}&only_unpublished=#{@only_unpublished}&query=#{filter}"
-      if @only_mine
-        @query << " AND " if @query.size > 0
-        @query << " iox_venues.created_by = #{current_user.id}"
-      end
-      if @conflict
-        @query << " AND " if @query.size > 0
-        @query << " (iox_venues.conflict IS TRUE OR iox_venues.conflict_id IS NOT NULL)"
-      end
-      @total_items = Venue.where( @query ).count
-      @page = (params[:skip] || 0).to_i
-      @page = @page / params[:pageSize].to_i if @page > 0 && params[:pageSize]
-      @limit = (params[:take] || 20).to_i
-      @total_pages = @total_items/@limit
-      @total_pages += 1 if ((@total_items % @limit) > 0)
-
-      @order = 'iox_venues.id'
-      if params[:sort]
-        sort = params[:sort]['0'][:field]
-        unless sort.blank?
-          sort = "iox_venues.#{sort}" if sort.match(/updated_at/)
-          sort = "LOWER(name)" if sort === 'name'
-          sort = "LOWER(iox_users.username)" if sort == 'updater_name'
-          @order = "#{sort} #{params[:sort]['0'][:dir]}"
-        end
-      end
-
-      @ensembles = Venue.where( @query ).limit( @limit ).includes(:updater).references(:iox_users).offset( (@page) * @limit ).order(@order).load
-
-      render json: { items: @ensembles, total: @total_items, order: @order }
+      render json: { items: q.load }
 
     end
 
@@ -68,7 +26,7 @@ module Openeras
       @venue.created_by = current_user.id
       if @venue.save
 
-        Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'created', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+        Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'created', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
         flash.now.notice = t('venue.saved', name: @venue.name)
         if request.xhr?
@@ -113,7 +71,7 @@ module Openeras
         @venue.updater = current_user
         @venue.attributes = venue_params
         if params[:transfer_to_venue_id]
-          if @receipient = Iox::Venue.where(id: params[:transfer_to_venue_id]).first
+          if @receipient = Openeras::Venue.where(id: params[:transfer_to_venue_id]).first
             venue_count = 0
             @venue.program_events.each do |event|
               event.venue = @receipient
@@ -121,7 +79,7 @@ module Openeras
             end
             flash.now.notice = t('venue.transfered', count: venue_count, name: @receipient.name)
 
-            Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'moved_events', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@receipient), recipient_name: @receipient.name
+            Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'moved_events', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@receipient), recipient_name: @receipient.name
             @venue.save
             return
 
@@ -131,7 +89,7 @@ module Openeras
           end
         end
         if @venue.save
-          Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'updated', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+          Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'updated', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
           flash.now.notice = t('venue.saved', name: @venue.name)
           flash.now.notice = t('settings_saved', name: @venue.name) if params[:settings_form]
@@ -175,7 +133,7 @@ module Openeras
       if check_404_and_privileges true
         if @venue && @venue.delete
 
-          Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'deleted', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+          Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'deleted', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
           flash.now.notice = t('venue.deleted', name: @venue.name, id: @venue.id)
         else
@@ -190,7 +148,7 @@ module Openeras
 
         if @venue.restore
 
-          Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'restored', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+          Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'restored', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
           flash.now.notice = t('venue.restored', name: @venue.name)
         else
