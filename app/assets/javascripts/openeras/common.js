@@ -42,14 +42,14 @@ function ProjectModel( attrs, _parent ){
     });
     return names;
   }, this);
-  
+
 }
 
 /**
  * remove an item
  */
 ProjectModel.prototype.removeItem = function removeItem( item ){
-  
+
 }
 
 /**
@@ -63,10 +63,10 @@ ProjectModel.prototype.saveItem = function saveItem( form ){
     url += '/'+this.id;
 
   this.translation().content = CKEDITOR.instances['translation[content]'].getData();
-  
+
   this.saveTranslation();
 
-  $.ajax({ 
+  $.ajax({
     url: url,
     data: { project: JSON.parse(ko.toJSON( this )) },
     type: ((this.id && this.id > 0) ? 'patch' : 'post'),
@@ -134,19 +134,24 @@ function setupCKEDITOR( $elem ){
       ['Source' ]
     ]
   });
- 
+
 }
 
 function setupDatesGrid( item, $container ){
   var kGrid = $("#dates-grid").kendoGrid({
     columns: [
       { field: 'starts_at', title: 'von',
-        format: '{0:dd.MM.yyyy HH:mm}',
+        format: '{0:dd.MM.yyyy}',
         width: 120
+      },
+      { field: 'starts_at', title: 'von',
+        format: '{0:HH:mm}',
+        width: 60
       },
       { field: 'ends_at', title: 'bis',
         format: '{0:HH:mm}',
-        width: 80 },
+        width: 80
+      },
       { field: "venue_name",
         title: 'Spielort',
         sortable: false
@@ -161,9 +166,32 @@ function setupDatesGrid( item, $container ){
       },
       { command:
         [
-          { name: 'edit'
+          { name: 'editEvent',
+            text: '<i class="icon-edit"></i>',
+            click: function(e){
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+              new iox.Win({
+                url: '/openeras/events/'+dataItem.id+'/edit',
+                completed: setupEventWin,
+                saveFormBtn: true
+              });
+            }
           },
-          { name: 'delete'
+          { name: 'deleteEvent', text: '<i class="icon-remove"></i>',
+            click: function(e){
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+              $.ajax({
+                url: '/openeras/events/'+ dataItem.id,
+                type: 'delete',
+                dataType: 'json'
+              }).done( function(json){
+                iox.flash.rails(json.flash);
+                if( json.success )
+                  kGrid.data('kendoGrid').removeRow( $(e.target).closest('tr') );
+              }).fail( function(json){
+                iox.flash.rails(json.flash);
+              });
+            }
           }
         ],
         width: 140
@@ -203,7 +231,7 @@ function setupDatesGrid( item, $container ){
       serverSorting: true,
       sort: { field: "updated_at", dir: "desc" }
     },
-    height: $(window).height()-200,
+    height: $(window).height()-240,
     selectable: "multiple",
     resizable: true,
     navigatable: true,
@@ -213,6 +241,93 @@ function setupDatesGrid( item, $container ){
       pageSize: 30,
       pageSizes: [10, 30, 50, 100]
     }
+  });
+
+}
+
+function setupEventWin( $win ){
+  $win.find('.iox-tabs').ioxTabs();
+  $win.find('.datetime').kendoDateTimePicker({
+    format: 'yyyy-MM-dd HH:mm',
+    dateFormat: "dd. MM. yyyy",
+    timeFormat: "HH:mm",
+    change: function( e ){
+      if( this.element.attr('id') === 'event_starts_at' ){
+        var endsAt = $win.find('#event_ends_at');
+        if( moment( this.value() ) >= moment( endsAt.val() ) )
+          endsAt.data('kendoDateTimePicker').value( moment( this.value() ).add('h',2).toDate() );
+      } else {
+        var startsAt = $win.find('#event_starts_at');
+        if( startsAt.data('kendoDateTimePicker').value() >= this.value() )
+          this.value( moment( startsAt.data('kendoDateTimePicker').value() ).add('h',2).toDate() );
+      }
+    }
+  }).on('click', function(){
+    $(this).data('kendoDateTimePicker').open();
+  });
+
+  $win.find('#event_event_type').select2({
+    tags: openeras.event_types,
+    tokenSeparators: [","]
+  });
+
+  $win.find('#event_venue_id').kendoComboBox({
+    placeholder: "Spielort wählen",
+    dataTextField: "name",
+    dataValueField: "id",
+    filter: "contains",
+    autoBind: false,
+    minLength: 1,
+    dataSource: {
+      type: "json",
+      serverFiltering: true,
+      transport: {
+        read: function( options ){
+          $.getJSON( '/openeras/venues', function( response ){
+            options.success( response.items );
+          });
+        }
+      }
+    }
+  });
+  $win.find('.venue-select .k-input').on('keyup', function(e){
+    if( e.keyCode === 13 && $('.k-list li').length < 1 ){
+      e.preventDefault();
+      e.stopPropagation();
+      if( confirm('Spielort "'+$(this).val()+'" neu erstellen?') ){
+        $.ajax({
+          url: '/openeras/venues',
+          data: { venue: { name: $(this).val() } },
+          type: 'post',
+          dataType: 'json'
+        }).done( function( response ){
+          if( response.success )
+            $win.find('#event_venue_id').data('kendoComboBox').dataSource.read();
+          iox.flash.rails( response.flash );
+        });
+      }
+    }
+  });
+
+  $win.find('#event_available_seats').kendoNumericTextBox({
+    format: "# Sitze"
+  });
+
+  $win.find('form').on('submit', function(e){
+    e.preventDefault();
+    $.ajax({
+      url: $(this).attr('action'),
+      data: $(this).serializeArray(),
+      type: $(this).attr('method'),
+      dataType: 'json'
+    }).done( function( response ){
+      if( response.success ){
+        $("#dates-grid").data('kendoGrid').dataSource.read();
+        if( !$win.find('.keep-open').is('checked') )
+          iox.Win.closeVisible();
+      }
+      iox.flash.rails( response.flash );
+    });
   });
 
 }

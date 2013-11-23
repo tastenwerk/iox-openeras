@@ -4,9 +4,10 @@ MiniOpeneras::Engine.routes.draw do
     resources :events
   end
 
+  resources :events
   resources :people
   resources :venues
-  
+
   resources :labels do
     collection do
       get :projects

@@ -7,8 +7,9 @@ class CreateOpenerasEvents < ActiveRecord::Migration
 
       t.datetime      :starts_at, index: true
       t.datetime      :ends_at
+      t.boolean       :all_day
 
-      t.string        :reductions
+      t.integer       :available_seats
 
       t.string        :event_type, index: true
 

@@ -132,11 +132,11 @@
 
               var self = this;
 
-              $.ajax({ 
-                url: '/openeras/labels', 
-                data: { name: name, type: 'Openeras::ProjectLabel' }, 
-                dataType: 'json', 
-                type: 'post' 
+              $.ajax({
+                url: '/openeras/labels',
+                data: { name: name, type: 'Openeras::ProjectLabel' },
+                dataType: 'json',
+                type: 'post'
               }).done( function( json ){
                 if( json.success ){
                   var item = new TreeItem( json.item, tree );
@@ -328,7 +328,7 @@
       e.preventDefault();
       iox.switchContent( 'next', function( $container ){
         $container.block();
-        $.getJSON( '/openeras/projects/new?init_label_id='+selectedLabelId(), 
+        $.getJSON( '/openeras/projects/new?init_label_id='+selectedLabelId(),
           function( response ){
             setupContainer( response, $container );
             $container.unblock();
@@ -336,6 +336,8 @@
       });
     })
 
+    window.openeras = window.openeras || {};
+    window.openeras.event_types = <%= raw Rails.configuration.openeras.event_types.to_json %>;
 
   });
 

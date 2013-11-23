@@ -23,10 +23,10 @@ module Openeras
 
     def create
       @venue = Venue.new venue_params
-      @venue.created_by = current_user.id
+      @venue.set_creator_and_updater( current_user )
       if @venue.save
 
-        Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'created', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+        Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'created', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
         flash.now.notice = t('venue.saved', name: @venue.name)
         if request.xhr?
@@ -36,10 +36,8 @@ module Openeras
         end
       else
         flash.now.alert = t('venue.saving_failed')
-        unless request.xhr?
-          render template: 'iox/venues/new'
-        end
       end
+      render json: { item: @venue, flash: flash, success: flash[:alert].blank? }
     end
 
     def simple
@@ -79,7 +77,7 @@ module Openeras
             end
             flash.now.notice = t('venue.transfered', count: venue_count, name: @receipient.name)
 
-            Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'moved_events', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@receipient), recipient_name: @receipient.name
+            Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'moved_events', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@receipient), recipient_name: @receipient.name
             @venue.save
             return
 
@@ -89,7 +87,7 @@ module Openeras
           end
         end
         if @venue.save
-          Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'updated', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+          Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'updated', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
           flash.now.notice = t('venue.saved', name: @venue.name)
           flash.now.notice = t('settings_saved', name: @venue.name) if params[:settings_form]
@@ -133,7 +131,7 @@ module Openeras
       if check_404_and_privileges true
         if @venue && @venue.delete
 
-          Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'deleted', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+          Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'deleted', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
           flash.now.notice = t('venue.deleted', name: @venue.name, id: @venue.id)
         else
@@ -148,7 +146,7 @@ module Openeras
 
         if @venue.restore
 
-          Openeras::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'restored', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
+          Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'restored', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
           flash.now.notice = t('venue.restored', name: @venue.name)
         else

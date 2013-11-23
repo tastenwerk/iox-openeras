@@ -1,0 +1,58 @@
+<div class="iox-tabs vertical">
+
+  <ul>
+    <li class="active"><a href="#event-general"><%= t('openeras.events.general') %></a></li>
+    <li><a href="#event-tickets"><%= t('openeras.events.tickets') %></a></li>
+  </ul>
+
+  <div class="clearfix">
+
+    <%= form_for @event, html: { class: 'iox-form openeras-event-form' } do |f| %>
+
+      <%= f.submit 'save', class: 'hide' %>
+
+      <%= f.hidden_field :project_id %>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.event.starts_at') %>
+        <%= f.text_field :starts_at, class: 'datetime' %>
+        <%= f.check_box :all_day %>
+        <span class="desc"><%= t('openeras.event.all_day') %></span>
+      </div>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.event.ends_at') %>
+        <%= f.text_field :ends_at, class: 'datetime' %>
+      </div>
+
+      <div class="field-box w-input venue-select">
+        <%= f.label t('openeras.event.venue') %>
+        <%= f.text_field :venue_id, class: 'select2' %>
+      </div>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.event.event_type') %>
+        <%= f.text_field :event_type, class: 'select2' %>
+      </div>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.event.note') %>
+        <%= f.text_area :additional_note %>
+      </div>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.event.available_seats') %>
+        <%= f.text_field :available_seats, size: 5 %>
+      </div>
+
+    <% end %>
+
+  </div>
+
+  <div class="clearfix">
+
+    <div id="tickets-grid"></div>
+
+  </div>
+
+</div>

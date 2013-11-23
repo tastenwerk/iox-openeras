@@ -10,71 +10,63 @@ module Openeras
     end
 
     def create
-      @program_event = ProgramEvent.new program_event_params
-      @program_event.reductions = params[:program_event][:reductions_arr].join(',') if params[:program_event][:reductions_arr] && params[:program_event][:reductions_arr].size > 0
-      if @program_event.save
-        flash.now.notice = t('program_event.saved', starts: l(@program_event.starts_at, format: :short), venue: (@program_event.venue ? @program_event.venue.name : '') )
-        @pentry = @program_event.program_entry
-        if @pentry.starts_at.blank? || @program_event.starts_at.nil? || @program_event.starts_at < @pentry.starts_at
-          @pentry.starts_at = @program_event.starts_at
-          @pentry.save
+      @event = Event.new event_params
+      if @event.save
+        flash.now.notice = t('event.saved', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : '') )
+        @project = @event.project
+        if @project.starts_at.blank? || @event.starts_at.nil? || @event.starts_at < @project.starts_at
+          @project.starts_at = @event.starts_at
+          @project.save
         end
-        if @pentry.ends_at.nil? || @program_event.starts_at > @pentry.ends_at
-          @pentry.ends_at = @program_event.starts_at
-          @pentry.save
+        if @project.ends_at.nil? || @event.starts_at > @project.ends_at
+          @project.ends_at = @event.starts_at
+          @project.save
         end
-        @json_event = { id: @program_event.id, festival_name: (@program_event.festival && @program_event.festival.title), venue_name: (@program_event.venue && @program_event.venue.name), starts_at: @program_event.starts_at }.to_json
       else
-        flash.now.alert = t('program_event.saving_failed')
+        flash.now.alert = t('event.saving_failed')
       end
-      render json: { flash: flash, item: @program_event }
+      render json: { flash: flash, item: @event, success: flash[:alert].blank? }
+    end
+
+    def new
+      @event = Event.new project_id: params[:project_id],
+                         starts_at: Time.now.strftime('%Y-%m-%d 20:00'),
+                         ends_at: Time.now.strftime('%Y-%m-%d 22:00'),
+                         available_seats: 80
+      render layout: false
+    end
+
+    def edit
+      unless @event = Event.find_by_id( params[:id] )
+        return render text: '', status: 404
+      end
+      render layout: false
     end
 
     def update
-      @program_event = ProgramEvent.find_by_id params[:id]
-      @program_event.updated_by = current_user.id
-      @program_event.attributes = program_event_params
-      @program_event.reductions = params[:program_event][:reductions_arr].join(',') if params[:program_event][:reductions_arr] && params[:program_event][:reductions_arr].size > 0
-      if @program_event.save
-        flash.now.notice = t('program_event.saved', starts: (@program_event.starts_at ? l(@program_event.starts_at, format: :short) : ''), venue: (@program_event.venue ? @program_event.venue.name : '') )
+      @event = Event.find_by_id params[:id]
+      if @event.update event_params
+        flash.now.notice = t('event.saved', starts: (@event.starts_at ? l(@event.starts_at, format: :short) : ''), venue: (@event.venue ? @event.venue.name : '') )
       else
-        flash.now.alert = t('program_event.saving_failed')
+        flash.now.alert = t('event.saving_failed')
       end
-      render json: { flash: flash, success: flash[:success], item: @program_event }
-    end
-
-    def multiply_field
-      @program_event = ProgramEvent.find_by_id params[:id]
-      @program_event.updated_by = current_user.id
-      if params[:value] && params[:field]
-        errors = 0
-        @program_event.program_entry.events.each do |event|
-          event.send("#{params[:field]}=", params[:value])
-          errors += 1 unless event.save
-        end
-        if errors == 0
-          flash.now.notice = t('program_event.multiplied', field: params[:field])
-        else
-          flash.now.alert = t('program_event.multiplying_failed', num: errors, field: params[:field])
-        end
-      end
-      render json: { flash: flash }
+      render json: { flash: flash, success: flash[:success], item: @event }
     end
 
     def destroy
-      @program_event = ProgramEvent.find_by_id( params[:id] )
-      if @program_event.destroy
-        flash.now.notice = t('program_event.deleted', starts: l(@program_event.starts_at, format: :short), venue: (@program_event.venue ? @program_event.venue.name : ''))
+      @event = Event.find_by_id( params[:id] )
+      if @event.destroy
+        flash.now.notice = t('event.deleted', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : ''))
       else
-        flash.now.alert = t('program_event.deletion_failed')
+        flash.now.alert = t('event.deletion_failed')
       end
-      render json: { flash: flash, item: @program_event }
+      render json: { flash: flash, item: @event }
     end
 
     private
 
-    def program_event_params
-      params.require(:program_event).permit([:starts_at, :ends_at, :festival_id, :event_type, :starts_at_time, :venue_id, :price_from, :price_to, :additional_note, :program_entry_id, :tickets_url, :tickets_phone, :description, :reductions, :reductions_arr => [] ])
+    def event_params
+      params.require(:event).permit([:starts_at, :ends_at, :festival_id, :event_type, :starts_at_time, :venue_id, :price_from, :price_to, :additional_note, :project_id, :tickets_url, :tickets_phone, :description, :reductions, :reductions_arr => [] ])
     end
 
   end

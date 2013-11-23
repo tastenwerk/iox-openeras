@@ -6,7 +6,7 @@
 
     <% if can_write_plugin?( 'openeras' ) %>
       <a data-bind="attr: { href: '/openeras/projects/'+id }, click: removeItem" class="btn" title="<%= t('delete') %>" data-confirm-proceed="<%= t('really_delete') %>"><span class="icon-trash-o"></span></a>
-      
+
       <a href="#" data-xhr-win="true" data-bind="attr: { 'data-xhr-href': '/openeras/projects/preferences'}
       " class="btn"><i class="icon-gear"></i></a>
 
@@ -96,6 +96,10 @@
     </div>
 
     <div class="clearfix iox-content-padding hide">
+
+      <div class="iox-grid-header clearfix">
+        <a data-bind="attr: { href: '/openeras/projects/'+id+'/events/new' }" style="padding: 0 7px" class="btn btn-success" data-xhr-win="true" data-xhr-win-title="<%= t('openeras.event.new') %>" data-xhr-win-callback="setupEventWin" data-xhr-win-save-form-button="true" title="<%= t('openeras.project.new') %>"><i class="icon-plus"></i></a>
+      </div>
 
       <div id="dates-grid" class="iox-k-grid"></div>
 

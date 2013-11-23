@@ -46,5 +46,19 @@ de:
       has_been_unpublished: "Veröffentlichung von &raquo;%{name}&laquo; wurde zurückgezogen"
       delete: "Projekt löschen"
       deleted: "Projekt &raquo;%{name}&laquo; wurde gelöscht <a href='/openeras/projects/%{id}/restore' data-method='post' data-remote='true'><i class='flash-icon icon-undo'></i>Wiederherstellen</a>"
-    
+
       dates: "Termine"
+
+    event:
+      new: "Neuer Termin"
+      starts_at: "Beginnt"
+      ends_at: "Endet"
+      all_day: "ganztags"
+      venue: "Spielort"
+      note: "Notiz"
+      event_type: "Typ"
+      general: "Allgemein"
+      tickets: "Tickets"
+      available_seats: "Sitzplätze"
+      saved: "Termin vom %{starts} in %{venue} gespeichert"
+      saving_failed: "Termin konnte nicht gespeichert werden"
