@@ -50,7 +50,7 @@ module Openeras
       else
         flash.now.alert = t('event.saving_failed')
       end
-      render json: { flash: flash, success: flash[:success], item: @event }
+      render json: { flash: flash, success: flash[:alert].blank?, item: @event }
     end
 
     def destroy
@@ -66,7 +66,15 @@ module Openeras
     private
 
     def event_params
-      params.require(:event).permit([:starts_at, :ends_at, :festival_id, :event_type, :starts_at_time, :venue_id, :price_from, :price_to, :additional_note, :project_id, :tickets_url, :tickets_phone, :description, :reductions, :reductions_arr => [] ])
+      params.require(:event).permit(
+        :starts_at, 
+        :ends_at, 
+        :all_day, 
+        :event_type, 
+        :venue_id,
+        :additional_note, 
+        :project_id, 
+        :description)
     end
 
   end

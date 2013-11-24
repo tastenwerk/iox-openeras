@@ -85,12 +85,16 @@ module Openeras
       @project = Project.new project_params
       @project.set_creator_and_updater( current_user )
       if @project.save
+
+        @project.update_label_ids
+           
         begin
           Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: 'created', icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: projects_path(@project)
         rescue
         end
         flash.now.notice = t('created', name: @project.title)
       else
+        puts @project.errors.inspect
         flash.now.alert = t('creation_failed')
       end
       render json: { item: @project, flash: flash, success: flash[:alert].blank? }
@@ -103,7 +107,10 @@ module Openeras
           @project.update project_params
           if @project.save
 
+            @project.update_label_ids
+            
             trans = @project.translations.where(locale: params[:project][:translation][:locale]).first
+            puts "trans: #{trans.locale if trans}"
             if trans
               trans.update translation_params
             else
@@ -116,6 +123,34 @@ module Openeras
           else
             flash.now.alert = t('saving_failed', name: @project.title)
           end
+        else
+          flash.now.alert('insufficient_rights')
+        end
+      else
+        flash.now.alert = t('not_found')
+      end
+      render json: { item: @project, flash: flash, success: flash[:alert].blank? }
+    end
+
+    # update a given translation
+    def translation
+      if @project = get_project
+        if can_modify?( @project )
+            
+          trans = @project.translations.where(locale: params[:project][:translation][:locale]).first
+          puts "trans: #{trans.locale if trans}"
+          if trans
+            puts "updateing #{translation_params.inspect}"
+            unless trans.update translation_params
+              flash.now.alert('saving_failed', name: @project.title)
+            end
+          else
+            unless @project.translations.create translation_params
+              flash.now.alert('saving_failed', name: @project.title)
+            end
+          end
+        else
+          flash.now.alert('insufficient_rights')
         end
       else
         flash.now.alert = t('not_found')
@@ -204,7 +239,8 @@ module Openeras
         :authors,
         :youtube_url, 
         :vimeo_url,
-        :has_breaks
+        :has_breaks,
+        :label_ids => []
       )
     end
 

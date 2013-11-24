@@ -10,10 +10,11 @@ de:
       title: "Spielorte"
 
     labels:
-      title: "Kategorien"
+      title: "Labels"
 
     label:
       new: "Neues Label"
+      give_name: "Name des neuen Labels"
 
     project:
       new: "Neues Projekt"
@@ -62,3 +63,11 @@ de:
       available_seats: "Sitzplätze"
       saved: "Termin vom %{starts} in %{venue} gespeichert"
       saving_failed: "Termin konnte nicht gespeichert werden"
+
+    venue:
+      new: "Neuer Spielort"
+      give_name: "Gib dem Spielort einen Namen"
+      saved: "Spielort &raquo;%{name}&laquo; wurde gespeichert"
+      saving_failed: "Spielort konnte nicht gespeichert werden"
+      deleted: "Spielort &raquo;%{name}&laquo; wurde gelöscht"
+      deletion_failed: "Spielort &raquo%{name}&laquo; konnte nicht gelöscht werden"

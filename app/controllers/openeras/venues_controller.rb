@@ -28,28 +28,16 @@ module Openeras
 
         Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'created', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
-        flash.now.notice = t('venue.saved', name: @venue.name)
+        flash.now.notice = t('openeras.venue.saved', name: @venue.name)
         if request.xhr?
           @remote = true
         else
           redirect_to edit_venue_path( @venue )
         end
       else
-        flash.now.alert = t('venue.saving_failed')
+        flash.now.alert = t('openeras.venue.saving_failed')
       end
       render json: { item: @venue, flash: flash, success: flash[:alert].blank? }
-    end
-
-    def simple
-      @query = ''
-      filter = (params[:filter] && params[:filter][:filters] && params[:filter][:filters]['0'] && params[:filter][:filters]['0'][:value]) || ''
-      @venues = Venue
-      unless filter.blank?
-        filter = filter.downcase
-        @venues = @venues.where("LOWER(name) LIKE ? OR LOWER(city) LIKE ?", "%#{filter}%", "%#{filter}%")
-      end
-
-      render json: @venues.order(:name).load
     end
 
     def edit
@@ -58,73 +46,22 @@ module Openeras
       render layout: @layout
     end
 
-    def settings_for
-      check_404_and_privileges
-      @obj = @venue
-      render template: '/iox/program_entries/settings_for', layout: false
-    end
-
     def update
       if check_404_and_privileges
         @venue.updater = current_user
         @venue.attributes = venue_params
-        if params[:transfer_to_venue_id]
-          if @receipient = Openeras::Venue.where(id: params[:transfer_to_venue_id]).first
-            venue_count = 0
-            @venue.program_events.each do |event|
-              event.venue = @receipient
-              venue_count += 1 if event.save
-            end
-            flash.now.notice = t('venue.transfered', count: venue_count, name: @receipient.name)
-
-            Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'moved_events', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@receipient), recipient_name: @receipient.name
-            @venue.save
-            return
-
-          else
-            flash.now.alert = t('venue.transfer_target_not_found_aborted')
-            return
-          end
-        end
         if @venue.save
           Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'updated', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
-          flash.now.notice = t('venue.saved', name: @venue.name)
-          flash.now.notice = t('settings_saved', name: @venue.name) if params[:settings_form]
+          flash.now.notice = t('openeras.venue.saved', name: @venue.name)
           redirect_to edit_venue_path( @venue ) unless request.xhr?
         else
-          flash.now.alert = t('venue.saving_failed')
-          flash.now.alert = t('settings_saved', name: @venue.name) if params[:settings_form]
-          render template: 'iox/venues/edit' unless request.xhr?
+          flash.now.alert = t('openeras.venue.saving_failed')
         end
       else
         redirect_to venues_path unless request.xhr?
       end
-    end
-
-    def members_of
-      if @venue = Venue.unscoped.where( id: params[:id] ).first
-        render json: @venue.members.load.to_json
-      else
-        render json: []
-      end
-    end
-
-    #
-    # upload logo
-    #
-    def upload_logo
-      if @venue = Venue.unscoped.where( id: params[:id] ).first
-        @img = @venue.images.build file: params[:venue][:logo]
-        @img.name = @img.file.original_filename
-        if @img.save
-          render :json => [@img.to_jq_upload('file')].to_json
-        else
-          render :json => [{:error => "custom_failure"}], :status => 304
-        end
-      else
-        render :json => [{:error => 'not found'}], :status => 404
-      end
+      render json: { item: @venue, flash: flash, success: flash[:alert].blank? }
     end
 
     def destroy
@@ -133,9 +70,9 @@ module Openeras
 
           Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'deleted', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
-          flash.now.notice = t('venue.deleted', name: @venue.name, id: @venue.id)
+          flash.now.notice = t('openeras.venue.deleted', name: @venue.name, id: @venue.id)
         else
-          flash.now.alert = t('venue.deletion_failed', name: @venue.name)
+          flash.now.alert = t('openeras.venue.deletion_failed', name: @venue.name)
         end
       end
       render json: { success: !flash.alert, flash: flash }
@@ -148,9 +85,9 @@ module Openeras
 
           Iox::Activity.create! user_id: current_user.id, obj_name: @venue.name, action: 'restored', icon_class: 'icon-map-marker', obj_id: @venue.id, obj_type: @venue.class.name, obj_path: venue_path(@venue)
 
-          flash.now.notice = t('venue.restored', name: @venue.name)
+          flash.now.notice = t('openeras.venue.restored', name: @venue.name)
         else
-          flash.now.alert = t('venue.failed_to_restore', name: @venue.name)
+          flash.now.alert = t('openeras.venue.failed_to_restore', name: @venue.name)
         end
       end
     end

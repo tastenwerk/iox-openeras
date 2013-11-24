@@ -6,6 +6,14 @@ module Openeras
 
     before_filter :authenticate!
     
+    def index
+      q = Label.where('')
+      if params[:query] && !params[:query].blank?
+        q = q.where("name LIKE ?", "%#{params[:query]}%")
+      end
+      render json: { items: q.load }
+    end
+
     def create
       if params[:name] && params[:name].size > 0
         @label = Label.new name: params[:name], type: params[:type]

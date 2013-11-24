@@ -16,7 +16,8 @@
         <input type="submit" value="<%= t('search') %>" />
         <a href="#" data-tree-role="search" title="<%= t('filter_results') %>"><i class="icon-search"></i></a>
         <a href="#" data-tree-role="refresh" title="<%= t('refresh') %>"><i class="icon-refresh"></i></a>
-        <a href="#" class="btn btn-success" data-tree-role="new" title="<%= t('openeras.label.new') %>"><i class="icon-plus"></i></a>
+        <a href="#" class="btn btn-success" data-tree-role="new" title="<%= t('webpage.new') %>"><i class="icon-plus"></i></a>
+
       </form>
     </div>
 
@@ -179,10 +180,6 @@
         noEntriesFound: '<%= t('filter_no_entries_found') %>'
       },
       events: {
-        afterRemove: function afterRemove( item ){
-          $('.iox-details-placeholder').show();
-          $('.iox-content-frame').hide();
-        },
         item: {
 
           /**

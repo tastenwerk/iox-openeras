@@ -11,8 +11,8 @@ function ProjectModel( attrs, _parent ){
 
   this.locale = ko.observable( this.locale );
   this.locale.subscribe( function( lang ){
-    this.saveTranslation();
-    this.saveItem();
+    this.saveTranslation( true );
+    //this.saveItem();
     lang = lang[0];
     var found = null;
     var last = null;
@@ -28,7 +28,8 @@ function ProjectModel( attrs, _parent ){
                         meta_keywords: last.meta_keywords,
                         meta_description: last.meta_description,
                         content: last.content });
-    CKEDITOR.instances['translation[content]'].setData( this.translation().content );
+    if( this.id && this.id > 0 )
+      CKEDITOR.instances['translation[content]'].setData( this.translation().content );
   }, this);
 
   this._parent = _parent;
@@ -61,48 +62,82 @@ ProjectModel.prototype.saveItem = function saveItem( form ){
   var url = '/openeras/projects';
   if( this.id && this.id > 0 )
     url += '/'+this.id;
-
-  this.translation().content = CKEDITOR.instances['translation[content]'].getData();
-
+  
   this.saveTranslation();
+
+  var project_json = JSON.parse(ko.toJSON( this ));
+
+  // TODO: labels sould be array of objects. but here it suddenly gets an array
+  // of ids
+  project_json.label_ids = project_json.labels;
 
   $.ajax({
     url: url,
-    data: { project: JSON.parse(ko.toJSON( this )) },
+    data: { project: project_json },
     type: ((this.id && this.id > 0) ? 'patch' : 'post'),
     dataType: 'json'
   }).done( function( response ){
     iox.flash.rails( response.flash );
     if( response.success ){
-      if( this.id && this.id > 0 )
-        ;
-      else {
-        self.id = response.item.id;
-        $('.openeras-project-tabs:visible').find(' > ul > li.disabled').removeClass('disabled');
-      }
+      if(!( this.id && this.id > 0 ) )
+        setupContainer( response.item, $('.iox-content:visible') );
+      $('#events-grid').data('kendoGrid').dataSource.read();
     }
 
   });
 
 }
 
+/**
+ * bug fixes a problem between kendo and knockout js bindings
+ *
+ProjectModel.prototype.updateMultiselect = function updateMultiselect(){
+  var multiSelect = $('#project-labels').data('kendoMultiSelect');
+  multiSelect.value().forEach( function( itemId ){
+    label_ids
+  });
+}*/
 
 /**
  * save a translation back to the translations list
  */
-ProjectModel.prototype.saveTranslation = function saveTranslation( form ){
+ProjectModel.prototype.saveTranslation = function saveTranslation( xhr ){
   var self = this;
-  var found;
+  
+  if( this.id && this.id > 0 )
+    this.translation().content = CKEDITOR.instances['translation[content]'].getData();
+
+  var found
+    , trans = {}
+    , transJS = ko.toJS(this.translation());
+
+  for( var i in transJS )
+    if( typeof(transJS[i]) !== 'function' && i !== '_events' )
+      trans[i] = transJS[i];
+
   this.translations.forEach( function(translation){
-    if( translation.locale === self.translation().locale ){
+    if( translation.locale === trans.locale ){
       found = true;
-      for( var i in self.translation() )
-        translation[i] = self.translation()[i];
+      for( var i in trans )
+        translation[i] = trans[i];
     }
   });
 
   if( !found )
-    this.translations.push( ko.toJS( this.translation() ) );
+    this.translations.push( trans );
+
+  console.log(xhr, trans.content );
+  if( xhr )
+    $.ajax({
+      url: '/openeras/projects/'+this.id+'/translation',
+      data: { project: { translation: trans } },
+      type: 'patch',
+      dataType: 'json'
+    }).done( function( response ){
+      console.log('done');
+      if( !response.success )
+        iox.flash.rails( response.flash );
+    });
 }
 
 /**
@@ -119,6 +154,77 @@ function setupPeopleSelectors( $container ){
   $.getJSON( '/openeras/people', function( response ){
     response.items.forEach( function(item){
       people.push({ id: item.id, text: item.name });
+    });
+  });
+
+}
+
+/**
+ * setup labels
+ */
+function setupLabelsSelectors( $container ){
+
+  var project = ko.dataFor( $container.get(0) );
+  var values = project.labels.map( function(item){
+    return { name: item.name, id: item.id };
+  });
+
+  $container.find('.project-labels').kendoMultiSelect({
+      placeholder: 'Labels hinzufügen',
+      dataTextField: 'name',
+      dataValueField: 'id',
+      autoBind: false,
+      minLength: 1,
+      dataSource: {
+        type: "json",
+        serverFiltering: true,
+        transport: {
+          read: function( options ){
+            console.log(options);
+            var q = '';
+            if( options.data.filter.filters.length > 0 )
+              q = options.data.filter.filters[0].value;
+            $.getJSON( '/openeras/labels/projects?query='+q, function( response ){
+              options.success( response.items );
+            });
+          }
+        }
+      },
+      value: values,
+      change: function( e ){
+        var project = ko.dataFor( $container.get(0) );
+        e.sender._dataItems.forEach( function( dataItem ){
+          project.labels.push( dataItem )
+        })
+      }
+  });
+
+
+  $container.find('.new-label').on('click', function(e){
+    e.preventDefault();
+    var multiSelect = $('#project-labels').data('kendoMultiSelect');
+    new iox.Win({
+      prompt: {
+        text: $(this).attr('data-prompt-text'),
+        callback: function( name, $container ){
+          $.ajax({
+            url: '/openeras/labels',
+            data: { name: name, type: 'Openeras::ProjectLabel' },
+            type: 'post',
+            dataType: 'json'
+          }).done( function( response ){
+            if( response.success ){
+              multiSelect.dataSource.add({
+                name: response.item.name,
+                id: response.item.id
+              });
+              multiSelect.value( response.item.id );
+              $('.labels-list-control [data-tree-role=refresh]').click();
+            }
+            iox.flash.rails( response.flash );
+          });
+        }
+      }
     });
   });
 
@@ -290,23 +396,34 @@ function setupEventWin( $win ){
       }
     }
   });
-  $win.find('.venue-select .k-input').on('keyup', function(e){
-    if( e.keyCode === 13 && $('.k-list li').length < 1 ){
-      e.preventDefault();
-      e.stopPropagation();
-      if( confirm('Spielort "'+$(this).val()+'" neu erstellen?') ){
-        $.ajax({
-          url: '/openeras/venues',
-          data: { venue: { name: $(this).val() } },
-          type: 'post',
-          dataType: 'json'
-        }).done( function( response ){
-          if( response.success )
-            $win.find('#event_venue_id').data('kendoComboBox').dataSource.read();
-          iox.flash.rails( response.flash );
-        });
+  $win.find('.new-venue').on('click', function(e){
+    e.preventDefault();
+    var comboBox = $('#event_venue_id').data('kendoComboBox');
+    new iox.Win({
+      prompt: {
+        text: $(this).attr('data-prompt-text'),
+        callback: function( name, $win ){
+          $.ajax({
+            url: '/openeras/venues',
+            data: { venue: { name: name } },
+            type: 'post',
+            dataType: 'json'
+          }).done( function( response ){
+            if( response.success ){
+              comboBox.dataSource.add({
+                name: response.item.name,
+                id: response.item.id
+              });
+              comboBox.select( function( dataItem ){
+                return dataItem.id === response.item.id;
+              });
+              $('.venues-list-control [data-tree-role=refresh]').click();
+            }
+            iox.flash.rails( response.flash );
+          });
+        }
       }
-    }
+    })
   });
 
   $win.find('#event_available_seats').kendoNumericTextBox({
@@ -337,8 +454,11 @@ function setupContainer( response, $container ){
   var item = new ProjectModel( response );
   ko.applyBindings( item, $container.get(0) );
   $container.find('.iox-tabs').ioxTabs();
-  setupPeopleSelectors( $container );
-  setupDatesGrid( item, $container );
-  setupCKEDITOR( $container.find('.editor') );
+  setupLabelsSelectors( $container );
+  if( response.id && response.id > 0 ){
+    setupPeopleSelectors( $container );
+    setupDatesGrid( item, $container );
+    setupCKEDITOR( $container.find('.editor') );
+  }
   $container.find('input[type=text]:visible:first').focus();
 }

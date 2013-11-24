@@ -5,7 +5,7 @@ module Openeras
 
     acts_as_iox_document
 
-    attr_accessor :venue_id, :venue_name, :locale, :init_label_id
+    attr_accessor :venue_id, :venue_name, :locale, :init_label_id, :label_ids
 
     belongs_to  :creator, class_name: 'Iox::User', foreign_key: 'created_by'
     belongs_to  :updater, class_name: 'Iox::User', foreign_key: 'updated_by'
@@ -76,10 +76,21 @@ module Openeras
       h[:translation] = translation
       h[:translations] = translations
       h[:locale] = locale || I18n.locale
+      h[:labels] = new_record? ? [] : labels
       h[:available_locales] = Rails.configuration.iox.available_langs || [:en]
       h[:updater_name] = updater ? updater.full_name : ( creator ? creator.full_name : '' )
       h
     end
+
+    def update_label_ids
+      return if ( ( label_ids.nil? || label_ids.size < 1 ) && labeled_items.size < 1 )
+      labeled_items.delete_all
+      return unless label_ids.is_a?(Array)
+      label_ids.each do |label_id|
+        labeled_items.create label_id: label_id, project_id: id
+      end
+    end
+
 
   end
 end

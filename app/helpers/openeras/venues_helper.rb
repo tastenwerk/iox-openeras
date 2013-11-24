@@ -2,8 +2,7 @@ module Openeras
   
   module VenuesHelper
 
-    include ProgramEntriesHelper
-    include Helpers::CountrySelectHelper
+    include Iox::Helpers::CountrySelectHelper
 
   end
 

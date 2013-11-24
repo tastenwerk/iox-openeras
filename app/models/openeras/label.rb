@@ -13,6 +13,8 @@ module Openeras
     has_many    :venues, through: :labeled_items, dependent: :nullify
     has_many    :events, through: :labeled_items, dependent: :nullify
 
+    validates_uniqueness_of :name
+
     def as_json(options = { })
       h = super(options)
       h

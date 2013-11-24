@@ -35,7 +35,7 @@
 
     <div class="clearfix iox-content-padding">
 
-      <form data-bind="submit: saveItem" class="iox-form openeras-project-form scrollable-content">
+      <form data-bind="submit: saveItem" style="margin-top: 40px;" class="iox-form openeras-project-form scrollable-content">
 
         <div class="field-box w-input required">
           <label for="title"><%= t('openeras.project.title') %></label>
@@ -50,6 +50,14 @@
         <div class="field-box w-input">
           <label for="title"><%= t('openeras.project.authors') %></label>
           <input type="text" name="project[authors]" class="project-authors select2" data-bind="value: author_names" />
+        </div>
+
+        <div class="field-box w-input">
+          <label for="title"><%= t('openeras.labels.title') %></label>
+          <select id="project-labels" name="project[label_ids]" class="project-labels" data-bind="options: labels, optionsText: 'name', optionsValue: 'id', selectedOptions: labels" />
+          <a class="btn new-label" title="<%= t('openeras.label.new') %>" data-prompt-text="<%= t('openeras.label.give_name') %>">
+            <i class="icon-plus"></i>
+          </a>
         </div>
 
         <div class="desc">

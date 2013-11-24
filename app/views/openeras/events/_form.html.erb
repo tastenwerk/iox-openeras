@@ -27,12 +27,15 @@
 
       <div class="field-box w-input venue-select">
         <%= f.label t('openeras.event.venue') %>
-        <%= f.text_field :venue_id, class: 'select2' %>
+        <%= f.select :venue_id, get_venue_as_option, class: 'select-venue' %>
+        <button data-prompt-text="<%= t('openeras.venue.give_name') %>" class="btn new-venue" title="<%= t('openeras.venue.new') %>">
+          <i class="icon-plus"></i>
+        </button>
       </div>
 
       <div class="field-box w-input">
         <%= f.label t('openeras.event.event_type') %>
-        <%= f.text_field :event_type, class: 'select2' %>
+        <%= f.text_field :event_type, placeholder: 'z.B. Premiere, Abgesagt, Derniere', class: 'select2' %>
       </div>
 
       <div class="field-box w-input">

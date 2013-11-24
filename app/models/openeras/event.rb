@@ -30,8 +30,9 @@ module Openeras
     private
 
     def update_start_end_time
-      if new_record? && ends_at.blank? && program_entry && program_entry.duration && program_entry.duration > 0
-        self.ends_at = starts_at+program_entry.duration.minutes
+      if all_day
+        self.starts_at = self.starts_at.beginning_of_day
+        self.ends_at = self.ends_at.end_of_day
       end
     end
 
