@@ -1,7 +1,7 @@
 require_dependency "iox/application_controller"
 
 module Openeras
-  class VenuesController < Openeras::ApplicationController
+  class VenuesController < Iox::ApplicationController
 
     before_filter :authenticate!
 

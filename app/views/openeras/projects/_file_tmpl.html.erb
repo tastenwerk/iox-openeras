@@ -1,0 +1,23 @@
+<script type="text/html" id="file-tmpl">
+<li data-bind="attr: { 'data-id': id }">
+  <img data-bind="attr: { src: thumb_url }" />
+  <div class="details">
+    <span class="filesize" data-bind="text: (file_file_size/1000.0).toString()+' kB'"></span>
+    <a class="download btn" target="_blank" data-bind="attr: { href: original_url }">
+      <i class="icon-download"></i>
+    </a>
+    <a class="btn" data-xhr-win-save-form-button="true" data-xhr-win-callback="setupProjectFileForm"
+        data-xhr-win="true" data-xhr-win-title="<%= t('openeras.file.settings') %>" data-bind="attr: { href: '/openeras/files/'+id+'/edit' }">
+      <i class="icon-edit"></i>
+    </a>
+    <a class="btn" data-bind="attr: { href: '/openeras/files/'+id }, click: removeProjectFile">
+      <i class="icon-remove"></i>
+    </a>
+  </div>
+  <div class="info">
+    <h4 data-bind="text: name"></h4>
+    <div class="description" data-bind="text: description"></div>
+    <div class="copyright" data-bind="text: copyright"></div>
+  </div>
+</li>
+</script>

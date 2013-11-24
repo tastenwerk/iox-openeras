@@ -3,6 +3,8 @@ class CreateOpenerasPrices < ActiveRecord::Migration
     create_table :openeras_prices do |t|
 
       t.string          :name
+      t.string          :note
+      t.boolean         :template, default: false
       t.float           :price
 
     end

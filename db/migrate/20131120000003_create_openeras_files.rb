@@ -12,6 +12,9 @@ class CreateOpenerasFiles < ActiveRecord::Migration
       t.belongs_to  :venue
       t.belongs_to  :person
 
+      t.integer     :updated_by
+      t.integer     :created_by
+
       t.timestamps
 
     end

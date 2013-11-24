@@ -64,8 +64,11 @@
 </div>
 
 <div class="iox-content offset-sidebar hide">
-  <%= render partial: 'form' %>
+  <div class="iox-content-frame auto-overflow" data-bind="template: { name: 'project-tmpl' }"></div>
 </div>
+
+<%= render partial: 'project_form_tmpl' %>
+<%= render partial: 'file_tmpl' %>
 
 <script id="iox-tree-item-template" type="text/html">
   <li data-bind=" attr: { 'data-id': id, id: 'item_'+id }, click: markItem">

@@ -15,6 +15,7 @@ module Openeras
     has_many :prices, through: :event_prices
 
     before_save :update_start_end_time
+    after_save :set_default_prices
 
     validate :starts_at, presence: true
     validate :ends_at, presence: true
@@ -33,6 +34,12 @@ module Openeras
       if all_day
         self.starts_at = self.starts_at.beginning_of_day
         self.ends_at = self.ends_at.end_of_day
+      end
+    end
+
+    def set_default_prices
+      Price.where( template: true ).each do |p|
+        event_prices.create! price_id: p.id
       end
     end
 

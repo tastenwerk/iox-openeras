@@ -1,4 +1,9 @@
 // common functions for openeras
+//
+//= require openeras/events
+//= require 3rdparty/jquery.ui.widget
+//= require 3rdparty/jquery.iframe-transport
+//= require 3rdparty/jquery.fileupload
 
 function ProjectModel( attrs, _parent ){
 
@@ -8,6 +13,15 @@ function ProjectModel( attrs, _parent ){
     this[i] = attrs[i];
 
   this.translation = ko.observable( this.translation );
+
+  if( this.files.length > 0 ){
+    this.files.forEach( function(file){
+      file.description = ko.observable(file.description);
+      file.copyright = ko.observable(file.copyright);
+      file.thumb_url = ko.observable(file.thumb_url);
+    });
+  }
+  this.files = ko.observableArray( this.files || [] );
 
   this.locale = ko.observable( this.locale );
   this.locale.subscribe( function( lang ){
@@ -278,8 +292,11 @@ function setupDatesGrid( item, $container ){
               var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
               new iox.Win({
                 url: '/openeras/events/'+dataItem.id+'/edit',
-                completed: setupEventWin,
-                saveFormBtn: true
+                completed: function($win){
+                  setupEventWin( $win, true );
+                },
+                saveFormBtn: true,
+                title: 'Termin bearbeiten'
               });
             }
           },
@@ -351,100 +368,39 @@ function setupDatesGrid( item, $container ){
 
 }
 
-function setupEventWin( $win ){
-  $win.find('.iox-tabs').ioxTabs();
-  $win.find('.datetime').kendoDateTimePicker({
-    format: 'yyyy-MM-dd HH:mm',
-    dateFormat: "dd. MM. yyyy",
-    timeFormat: "HH:mm",
-    change: function( e ){
-      if( this.element.attr('id') === 'event_starts_at' ){
-        var endsAt = $win.find('#event_ends_at');
-        if( moment( this.value() ) >= moment( endsAt.val() ) )
-          endsAt.data('kendoDateTimePicker').value( moment( this.value() ).add('h',2).toDate() );
-      } else {
-        var startsAt = $win.find('#event_starts_at');
-        if( startsAt.data('kendoDateTimePicker').value() >= this.value() )
-          this.value( moment( startsAt.data('kendoDateTimePicker').value() ).add('h',2).toDate() );
-      }
+function setupFileUpload( item, $container ){
+
+  $('#upload').fileupload({
+    url: '/openeras/projects/'+item.id+'/files',
+    processQueue: {
+      action: 'validate',
+      acceptFileTypes: /(\.|\/)(gif|jpe?g|png|pdf)$/i
+    },
+    dataType: 'json',
+    formData: {
+      "authenticity_token": $('input[name="authenticity_token"]:first').val()
+    },
+    dragover: function( e ){
+      $(this).closest('.upload-container').addClass('drop-here');
+    },
+    drop: function( e, data ){
+      $(this).closest('.upload-container').removeClass('drop-here');
+    },
+    done: function( e, data ){
+      $(this).closest('.upload-container').removeClass('drop-here');
+      var response = data._response.result;
+      item.files.push( response.item );
+      setTimeout( function(){
+        $('#files-progress .bar').css( 'width', 0 );
+      }, 500 );
+    },
+    error: function( response, type, msg ){
+      iox.flash.alert( JSON.parse(response.responseText).errors.file[0] );
+    },
+    progressall: function( e, data ){
+      var progress = parseInt(data.loaded / data.total * 100, 10);
+      $('#files-progress .bar').css( 'width', progress + '%' );
     }
-  }).on('click', function(){
-    $(this).data('kendoDateTimePicker').open();
-  });
-
-  $win.find('#event_event_type').select2({
-    tags: openeras.event_types,
-    tokenSeparators: [","]
-  });
-
-  $win.find('#event_venue_id').kendoComboBox({
-    placeholder: "Spielort wählen",
-    dataTextField: "name",
-    dataValueField: "id",
-    filter: "contains",
-    autoBind: false,
-    minLength: 1,
-    dataSource: {
-      type: "json",
-      serverFiltering: true,
-      transport: {
-        read: function( options ){
-          $.getJSON( '/openeras/venues', function( response ){
-            options.success( response.items );
-          });
-        }
-      }
-    }
-  });
-  $win.find('.new-venue').on('click', function(e){
-    e.preventDefault();
-    var comboBox = $('#event_venue_id').data('kendoComboBox');
-    new iox.Win({
-      prompt: {
-        text: $(this).attr('data-prompt-text'),
-        callback: function( name, $win ){
-          $.ajax({
-            url: '/openeras/venues',
-            data: { venue: { name: name } },
-            type: 'post',
-            dataType: 'json'
-          }).done( function( response ){
-            if( response.success ){
-              comboBox.dataSource.add({
-                name: response.item.name,
-                id: response.item.id
-              });
-              comboBox.select( function( dataItem ){
-                return dataItem.id === response.item.id;
-              });
-              $('.venues-list-control [data-tree-role=refresh]').click();
-            }
-            iox.flash.rails( response.flash );
-          });
-        }
-      }
-    })
-  });
-
-  $win.find('#event_available_seats').kendoNumericTextBox({
-    format: "# Sitze"
-  });
-
-  $win.find('form').on('submit', function(e){
-    e.preventDefault();
-    $.ajax({
-      url: $(this).attr('action'),
-      data: $(this).serializeArray(),
-      type: $(this).attr('method'),
-      dataType: 'json'
-    }).done( function( response ){
-      if( response.success ){
-        $("#dates-grid").data('kendoGrid').dataSource.read();
-        if( !$win.find('.keep-open').is('checked') )
-          iox.Win.closeVisible();
-      }
-      iox.flash.rails( response.flash );
-    });
   });
 
 }
@@ -459,6 +415,11 @@ function setupContainer( response, $container ){
     setupPeopleSelectors( $container );
     setupDatesGrid( item, $container );
     setupCKEDITOR( $container.find('.editor') );
+    setupFileUpload( item, $container );
   }
   $container.find('input[type=text]:visible:first').focus();
+}
+
+function filterProjects( item, e ){
+  item.markItem();
 }

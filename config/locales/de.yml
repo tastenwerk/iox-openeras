@@ -71,3 +71,23 @@ de:
       saving_failed: "Spielort konnte nicht gespeichert werden"
       deleted: "Spielort &raquo;%{name}&laquo; wurde gelöscht"
       deletion_failed: "Spielort &raquo%{name}&laquo; konnte nicht gelöscht werden"
+
+    price:
+      add: "Neuen Preis anlegen"
+      update_this_event: "In allen Terminen übernehmen"
+      update_this_event_desc: "Übernimmt diese Preise für alle Termine dieser Veranstaltung"
+      make_template: "Als Standard definieren"
+      make_template_desc: "Diese Preise für zukünftige Termine als Vorlage definieren"
+      project_updated: "Alle Termine aus Projekt %{name} wurden mit diesen Preisen aktualisiert"
+      made_template: "Diese Preise werden nun für zukünftige Projekte als Vorlage Verwendet"
+
+    file:
+      upload: "Hochladen"
+      saving_failed: "Datei konnte nicht gespeichert werden"
+      saved: "Datei %{name} wurde gespeichert"
+      deletion_failed: "Datei %{name} konnte nicht gelöscht werden (Grund: %{error})"
+      deleted: "Datei %{name} wurde gelöscht"
+      delete_q: "Datei löschen?"
+      description: "Beschreibung"
+      copyright: "Copyright"
+      settings: "Einstellungen"

@@ -52,9 +52,15 @@
 
   </div>
 
-  <div class="clearfix">
+  <div class="clearfix" style="width: 800px; height: 490px">
 
-    <div id="tickets-grid"></div>
+    <div class="grid-control prices-control">
+      <a class="btn btn-warning apply-project" title="<%= t('openeras.price.update_this_event_desc') %>"><%= t('openeras.price.update_this_event') %></a>
+      <a class="btn btn-warning make-template" title="<%= t('openeras.price.make_template_desc') %>"><%= t('openeras.price.make_template') %></a>
+      <a class="btn add-price"><i class="icon-plus"></i> <%= t('openeras.price.add') %></a>
+    </div>
+
+    <div id="prices-grid" style="width: 800px; height: 400px" data-event-id="<%= @event.id unless @event.new_record? %>"></div>
 
   </div>
 

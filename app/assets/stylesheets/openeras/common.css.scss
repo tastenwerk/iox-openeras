@@ -54,3 +54,120 @@
 .openeras-event-form .new-venue{
   width: 20px;
 }
+
+.prices-control{
+  text-align: right;
+  margin: 10px;
+}
+
+.prices-control .btn{
+  padding: 2px 8px;
+  margin-left: 5px
+}
+
+.upload-container .icon-plus{ 
+  font-size: 40px; 
+  line-height: 40px;
+  color: #ddd; 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  height: 40px;
+  margin: auto; 
+  display: block; 
+  z-index: 0; 
+  text-align: center; 
+}
+.upload-container{ 
+  border: 1px solid #eee; 
+  color: #777; 
+  float: none; 
+  width: 100%; 
+  height: 100px;
+  position: relative; 
+}
+.upload-container:hover{
+  background: #eee;
+  border-color: #999;
+}
+.upload-container:hover .icon-plus{
+  color: #aaa;
+}
+.upload-container.drop-here{ background: #08c; color: #fff; }
+.upload-container input[type=file]{ 
+  opacity: 0; 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100px; 
+  z-index: 3; 
+  cursor: pointer;
+}
+
+.files-list{
+  list-style: none;
+  margin: 20px 0 0 0;
+  padding: 0;
+}
+
+.files-list li{
+  height: 60px;
+}
+
+.files-list img{
+  width: 50px;
+  height: 50px;
+  border: 3px solid #fff;
+  border: 1px solid #ddd;
+  float: left;
+}
+
+.files-list .details{
+  float: right;
+  padding: 10px 20px;
+}
+
+.files-list .details a{
+  color: #bbb;
+  padding: 0 5px;
+}
+
+.files-list .details a:hover{
+  color: #333;
+}
+
+.files-list .info{
+  margin-left: 60px;
+  padding: 10px;
+}
+
+.files-list .info h4{
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  line-height: 14px;
+}
+.files-list .filesize{
+  color: #999;
+  font-size: 0.9em;
+}
+
+.files-list .description,
+.files-list .copyright{
+  color: #999;
+  font-size: 0.8em;
+}
+
+#files-progress{
+  width: 100%;
+  height: 5px;
+}
+
+#files-progress .bar{
+  background-color: #3F95FF;
+  height: 5px;
+}

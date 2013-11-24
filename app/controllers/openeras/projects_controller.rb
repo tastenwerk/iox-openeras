@@ -14,6 +14,8 @@ module Openeras
         filter = filter.downcase
         if filter.match(/^[\d]*$/)
           @query = @query.where('project.id' => filter)
+        elsif filter.include?('#')
+          @query = @query.where( 'openeras_labels.id' => filter.split('#')[0] )
         else
           @query = @query.where "LOWER(title) LIKE ? OR LOWER(subtitle) LIKE ? OR LOWER(openeras_projects.meta_keywords) LIKE ?", 
                                 "%#{filter}",
@@ -46,7 +48,7 @@ module Openeras
       end
 
       # setup full query
-      @query = @query.includes(:updater).references(:iox_users)
+      @query = @query.includes(:updater,:labels).references(:iox_users, :openeras_labels)
 
       @total_items = @query.count
 

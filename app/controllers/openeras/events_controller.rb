@@ -73,7 +73,8 @@ module Openeras
         :event_type, 
         :venue_id,
         :additional_note, 
-        :project_id, 
+        :project_id,
+        :available_seats,
         :description)
     end
 

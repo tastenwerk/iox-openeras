@@ -1,5 +1,3 @@
-<div class="iox-content-frame auto-overflow" data-bind="template: { name: 'project-tmpl' }"></div>
-
 <script type="text/html" id="project-tmpl">
 
   <div class="iox-form-control">
@@ -115,7 +113,13 @@
 
     <div class="clearfix iox-content-padding hide">
 
-      <h1>files</h1>
+      <div class="upload-container">
+        <span class="icon-plus"></span>
+        <input type="file" id="upload" name="file" multiple="true" />
+      </div>
+      <div id="files-progress"><div style="width:0" class="bar"></div></div>
+
+      <ul id="files-list" class="files-list" data-bind="template: { name: 'file-tmpl', foreach: files }"></ul>
 
     </div>
 

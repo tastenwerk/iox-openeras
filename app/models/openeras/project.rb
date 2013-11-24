@@ -18,6 +18,8 @@ module Openeras
     has_many    :project_people, dependent: :destroy
     has_many    :people, through: :project_people
 
+    has_many    :files, dependent: :destroy
+
     validates   :title, presence: true, length: { in: 2..255 }
     validates   :subtitle, length: { maximum: 255 }
     validates   :age, inclusion: { in: 1..20 }, numericality: true, allow_blank: true
@@ -77,6 +79,7 @@ module Openeras
       h[:translations] = translations
       h[:locale] = locale || I18n.locale
       h[:labels] = new_record? ? [] : labels
+      h[:files] = new_record? ? [] : files
       h[:available_locales] = Rails.configuration.iox.available_langs || [:en]
       h[:updater_name] = updater ? updater.full_name : ( creator ? creator.full_name : '' )
       h

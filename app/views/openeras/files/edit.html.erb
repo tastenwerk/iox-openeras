@@ -1,0 +1,15 @@
+<%= form_for @file, html: { class: 'iox-form content-padding' } do |f| %>
+
+  <%= f.submit 'save', class: 'hide' %>
+
+  <div class="field-box w-input">
+    <%= f.label t('openeras.file.description') %>
+    <%= f.text_field :description %>
+  </div>
+
+  <div class="field-box w-input">
+    <%= f.label t('openeras.file.copyright') %>
+    <%= f.text_field :copyright %>
+  </div>
+
+<% end %>
