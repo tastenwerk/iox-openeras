@@ -8,8 +8,6 @@ module MiniOpeneras
 
     initializer :assets do |config|
       Rails.application.config.assets.precompile += %w(
-        program_entries.js
-        program_entries.css
         3rdparty/leaflet.js
         3rdparty/leaflet.css
         3rdparty/leaflet.ie.css
@@ -18,6 +16,7 @@ module MiniOpeneras
         3rdparty/images/marker-shadow.png
         3rdparty/images/*.png
         openeras/common.js
+        openeras/common.css
       )
 
     end
