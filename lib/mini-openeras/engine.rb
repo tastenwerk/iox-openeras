@@ -14,10 +14,10 @@ module MiniOpeneras
         3rdparty/leaflet.css
         3rdparty/leaflet.ie.css
         3rdparty/leafletjs/*
-        iox/venues.js
         3rdparty/images/marker-icon.png
         3rdparty/images/marker-shadow.png
         3rdparty/images/*.png
+        openeras/common.js
       )
 
     end
