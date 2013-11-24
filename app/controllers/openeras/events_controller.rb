@@ -12,7 +12,7 @@ module Openeras
     def create
       @event = Event.new event_params
       if @event.save
-        flash.now.notice = t('event.saved', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : '') )
+        flash.now.notice = t('openeras.event.saved', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : '') )
         @project = @event.project
         if @project.starts_at.blank? || @event.starts_at.nil? || @event.starts_at < @project.starts_at
           @project.starts_at = @event.starts_at
@@ -23,7 +23,7 @@ module Openeras
           @project.save
         end
       else
-        flash.now.alert = t('event.saving_failed')
+        flash.now.alert = t('openeras.event.saving_failed')
       end
       render json: { flash: flash, item: @event, success: flash[:alert].blank? }
     end
@@ -46,9 +46,9 @@ module Openeras
     def update
       @event = Event.find_by_id params[:id]
       if @event.update event_params
-        flash.now.notice = t('event.saved', starts: (@event.starts_at ? l(@event.starts_at, format: :short) : ''), venue: (@event.venue ? @event.venue.name : '') )
+        flash.now.notice = t('openeras.event.saved', starts: (@event.starts_at ? l(@event.starts_at, format: :short) : ''), venue: (@event.venue ? @event.venue.name : '') )
       else
-        flash.now.alert = t('event.saving_failed')
+        flash.now.alert = t('openeras.event.saving_failed')
       end
       render json: { flash: flash, success: flash[:alert].blank?, item: @event }
     end
@@ -56,9 +56,9 @@ module Openeras
     def destroy
       @event = Event.find_by_id( params[:id] )
       if @event.destroy
-        flash.now.notice = t('event.deleted', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : ''))
+        flash.now.notice = t('openeras.event.deleted', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : ''))
       else
-        flash.now.alert = t('event.deletion_failed')
+        flash.now.alert = t('openeras.event.deletion_failed')
       end
       render json: { flash: flash, item: @event }
     end

@@ -15,12 +15,21 @@ module Openeras
         if filter.match(/^[\d]*$/)
           @query = @query.where('project.id' => filter)
         elsif filter.include?('#')
-          @query = @query.where( 'openeras_labels.id' => filter.split('#')[0] )
+          if( filter[0] == '#' )
+            @query = @query.where( 'openeras_labels.name LIKE ?', "%#{filter.split('#')[1]}%" )
+          else
+            @query = @query.where( 'openeras_labels.id' => filter.split('#')[0] )
+          end
+        elsif filter.include?('@')
+          if( filter[0] == '@' )
+            @query = @query.where( 'openeras_venues.name LIKE ?', "%#{filter.split('@')[1]}%" )
+          else
+            @query = @query.where( 'openeras_venues.id' => filter.split('@')[0] )
+          end
         else
-          @query = @query.where "LOWER(title) LIKE ? OR LOWER(subtitle) LIKE ? OR LOWER(openeras_projects.meta_keywords) LIKE ?", 
-                                "%#{filter}",
-                                "%#{filter}",
-                                "%#{filter}"
+          @query = @query.where "LOWER(title) LIKE ? OR LOWER(subtitle) LIKE ?", 
+                                "%#{filter}%",
+                                "%#{filter}%"
         end
       end
 
@@ -48,7 +57,7 @@ module Openeras
       end
 
       # setup full query
-      @query = @query.includes(:updater,:labels).references(:iox_users, :openeras_labels)
+      @query = @query.includes(:updater,:labels,:venues).references(:iox_users, :openeras_labels, :openeras_venues)
 
       @total_items = @query.count
 

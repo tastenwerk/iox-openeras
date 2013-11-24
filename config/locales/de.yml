@@ -34,9 +34,9 @@ de:
       general: "Allgemein"
       dates: "Termine"
       location: "Spielort"
-      files: "Medienmaterial"
+      files: "Medien"
 
-      text_and_langs: "Text und Sprachen"
+      text_and_langs: "Text / Sprachen"
       body: "Textkörper"
 
       lang: "Sprache"
@@ -58,11 +58,15 @@ de:
       venue: "Spielort"
       note: "Notiz"
       event_type: "Typ"
+      deleted: "Termin vom %{starts} wurde gelöscht"
+      deletion_failed: "Termin konnte nicht gelöscht werden"
       general: "Allgemein"
       tickets: "Tickets"
+      prices: "Kartenpreise"
       available_seats: "Sitzplätze"
       saved: "Termin vom %{starts} in %{venue} gespeichert"
       saving_failed: "Termin konnte nicht gespeichert werden"
+      prices_cannot_be_edited_until_saved: "Kartenpreise können erst bearbeitet werden, wenn dieser Termin gespeichert wurde"
 
     venue:
       new: "Neuer Spielort"
@@ -76,7 +80,7 @@ de:
       add: "Neuen Preis anlegen"
       update_this_event: "In allen Terminen übernehmen"
       update_this_event_desc: "Übernimmt diese Preise für alle Termine dieser Veranstaltung"
-      make_template: "Als Standard definieren"
+      make_template: "Als Standard festlegen"
       make_template_desc: "Diese Preise für zukünftige Termine als Vorlage definieren"
       project_updated: "Alle Termine aus Projekt %{name} wurden mit diesen Preisen aktualisiert"
       made_template: "Diese Preise werden nun für zukünftige Projekte als Vorlage Verwendet"

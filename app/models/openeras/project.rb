@@ -5,7 +5,7 @@ module Openeras
 
     acts_as_iox_document
 
-    attr_accessor :venue_id, :venue_name, :locale, :init_label_id, :label_ids
+    attr_accessor :venue_id, :locale, :init_label_id, :label_ids
 
     belongs_to  :creator, class_name: 'Iox::User', foreign_key: 'created_by'
     belongs_to  :updater, class_name: 'Iox::User', foreign_key: 'updated_by'
@@ -14,6 +14,8 @@ module Openeras
 
     has_many    :labeled_items, dependent: :destroy
     has_many    :labels, through: :labeled_items
+
+    has_many    :venues, through: :events
 
     has_many    :project_people, dependent: :destroy
     has_many    :people, through: :project_people
@@ -29,20 +31,24 @@ module Openeras
 
     accepts_nested_attributes_for :translations
 
-    def venues
-      v = ''
-      if events.size > 0 and events.first.venue
-        v << "<a href='/iox/venues/#{events.first.venue.id}'>#{events.first.venue.name}/edit</a>"
-      end
-      v
-    end
-
     def authors
       if a = people.where("openeras_project_people.function='author'").load
         return a
       end
       return []
     end
+
+    def venue_name
+      names = []
+      if events && events.size > 0 
+        events.each do |event|
+          names << event.venue.name if event.venue && !names.include?(event.venue.name)
+        end
+      end
+      names.join(',')
+    end
+
+
 
     def authors=(names)
       names.split(',').each do |author_name|

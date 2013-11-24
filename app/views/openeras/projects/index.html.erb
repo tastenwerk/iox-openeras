@@ -49,9 +49,9 @@
     <div class="iox-grid-header clearfix">
       <a href="<%= new_project_path %>" class="new-project btn btn-success" data-tree-role="new" rel="tooltip"><%= t('openeras.project.new') %></a>
       <div class="query-container">
-        <input type="text" class="query" name="query" autocomplete="off" />
+        <input type="text" class="query" id="projects-query" name="query" autocomplete="off" />
         <button class="clear-query"><i class="icon-remove"></i></button>
-        <button class="submit-query"><i class="icon-search"></i></button>
+        <button id="submit-projects-query" class="submit-query"><i class="icon-search"></i></button>
       </div>
       <div class="options-container">
       </div>
@@ -70,15 +70,28 @@
 <%= render partial: 'project_form_tmpl' %>
 <%= render partial: 'file_tmpl' %>
 
-<script id="iox-tree-item-template" type="text/html">
-  <li data-bind=" attr: { 'data-id': id, id: 'item_'+id }, click: markItem">
+<script id="labels-tree-template" type="text/html">
+  <li data-bind=" attr: { 'data-id': id, id: 'item_'+id }, click: filterProjectsByLabel">
     <div class="item clearfix" data-bind=" css: { selected: _selected, hide: _hide }">
       <div class="actions">
         <a href="#" data-bind="click: removeItem" class="remove-item" title="<%= t('delete') %>">
           <span class="icon-close"></span>
         </a>
       </div>
-      <span class="color-ball" data-bind="attr: { class: color }"></span>
+      <span class="color-ball" data-bind="attr: { style: 'background-color: '+color()+';' }"></span>
+      <a class="title" data-bind="click: listContent, attr: { title: name }, text: name"></a>
+    </div>
+  </li>
+</script>
+
+<script id="venues-tree-template" type="text/html">
+  <li data-bind=" attr: { 'data-id': id, id: 'item_'+id }, click: filterProjectsByVenue">
+    <div class="item clearfix" data-bind=" css: { selected: _selected, hide: _hide }">
+      <div class="actions">
+        <a href="#" data-bind="click: removeItem" class="remove-item" title="<%= t('delete') %>">
+          <span class="icon-close"></span>
+        </a>
+      </div>
       <a class="title" data-bind="click: listContent, attr: { title: name }, text: name"></a>
     </div>
   </li>
@@ -103,6 +116,7 @@
      */
     $('#labels-list').ioxTree({
       url: '/openeras/labels/projects',
+      template: 'labels-tree-template',
       observe: ['name', 'color'],
       control: $('.labels-list-control'),
       i18n:{
@@ -177,6 +191,7 @@
      */
     $('#venues-list').ioxTree({
       url: '/openeras/venues',
+      template: 'venues-tree-template',
       observe: ['name', 'color'],
       control: $('.venues-list-control'),
       i18n:{
@@ -200,6 +215,7 @@
 
       }
     });
+
 
     var kGrid = $("#events-grid").kendoGrid({
       columns: [
@@ -301,40 +317,7 @@
       }
     });
 
-    $(document).on('click', '.publish-button', function(){
-      var $elem = $(this);
-      var node = kGrid.data('kendoGrid').dataItem( $(this).closest('tr').get(0) );
-      node.published = !node.published;
-      $.ajax({ url: '/openeras/projects/'+node.id+'/publish?publish='+(node.published ? 'true' : 'false'),
-               type: 'put',
-               dataType: 'json',
-               data: { publish: $(this).hasClass('on') },
-               success: function( data ){
-                 iox.flash.rails( data.flash );
-                 if( data.success )
-                  if( data.item.published )
-                    $elem.addClass('icon-ok-sign').removeClass('icon-ban-circle');
-                  else
-                    $elem.removeClass('icon-ok-sign').addClass('icon-ban-circle');
-               }
-      });
-    });
-
-    /**
-     * show new form above current grid
-     *
-     */
-    $('.new-project.btn').on('click', function(e){
-      e.preventDefault();
-      iox.switchContent( 'next', function( $container ){
-        $container.block();
-        $.getJSON( '/openeras/projects/new?init_label_id='+selectedLabelId(),
-          function( response ){
-            setupContainer( response, $container );
-            $container.unblock();
-        });
-      });
-    })
+    setupProjectsList( kGrid );
 
     window.openeras = window.openeras || {};
     window.openeras.event_types = <%= raw Rails.configuration.openeras.event_types.to_json %>;

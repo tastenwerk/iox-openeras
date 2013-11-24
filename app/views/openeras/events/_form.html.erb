@@ -2,7 +2,7 @@
 
   <ul>
     <li class="active"><a href="#event-general"><%= t('openeras.events.general') %></a></li>
-    <li><a href="#event-tickets"><%= t('openeras.events.tickets') %></a></li>
+    <li><a href="#event-tickets"><%= t('openeras.events.prices') %></a></li>
   </ul>
 
   <div class="clearfix">
@@ -54,6 +54,14 @@
 
   <div class="clearfix" style="width: 800px; height: 490px">
 
+    <% if @event.new_record? %>
+
+      <div class="content-padding" style="text-align: center; margin-top: 50px">
+        <%= t('openeras.event.prices_cannot_be_edited_until_saved') %>
+      </div>
+
+    <% else %>
+
     <div class="grid-control prices-control">
       <a class="btn btn-warning apply-project" title="<%= t('openeras.price.update_this_event_desc') %>"><%= t('openeras.price.update_this_event') %></a>
       <a class="btn btn-warning make-template" title="<%= t('openeras.price.make_template_desc') %>"><%= t('openeras.price.make_template') %></a>
@@ -61,6 +69,8 @@
     </div>
 
     <div id="prices-grid" style="width: 800px; height: 400px" data-event-id="<%= @event.id unless @event.new_record? %>"></div>
+
+    <% end %>
 
   </div>
 

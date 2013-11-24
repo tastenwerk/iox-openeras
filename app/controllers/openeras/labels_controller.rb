@@ -16,7 +16,7 @@ module Openeras
 
     def create
       if params[:name] && params[:name].size > 0
-        @label = Label.new name: params[:name], type: params[:type]
+        @label = Label.new name: params[:name], type: params[:type], color: '#444'
         if @label.save
           flash.now.notice = t('saved', name: @label.name)
         else

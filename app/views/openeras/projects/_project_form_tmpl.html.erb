@@ -5,10 +5,11 @@
     <% if can_write_plugin?( 'openeras' ) %>
       <a data-bind="attr: { href: '/openeras/projects/'+id }, click: removeItem" class="btn" title="<%= t('delete') %>" data-confirm-proceed="<%= t('really_delete') %>"><span class="icon-trash-o"></span></a>
 
-      <a href="#" data-xhr-win="true" data-bind="attr: { 'data-xhr-href': '/openeras/projects/preferences'}
-      " class="btn"><i class="icon-gear"></i></a>
+      <a href="#" data-role="switchBackContent" class="btn" title="<%= t('back_to_list') %>"><i class="icon-list-alt"></i></a>
 
-      <a href="#" data-role="switchBackContent" class="btn"><i class="icon-arrow-circle-left"></i></a>
+      <a href="#" data-role="loadPrevFromUnderlyingList" class="btn" title="<%= t('next_entry') %>"><i class="icon-arrow-circle-right"></i></a>
+
+      <a href="#" data-role="loadNextFromUnderlyingList" title="<%= t('previous_entry') %>" class="btn"><i class="icon-arrow-circle-left"></i></a>
 
       <a href="#" data-bind="click: saveItem" class="btn btn-primary" title="<%= t('save') %>"><span class="icon-save"></span>&nbsp; <%= t('save') %></a>
 
