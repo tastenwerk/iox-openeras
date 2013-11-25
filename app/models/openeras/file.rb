@@ -4,13 +4,10 @@ module Openeras
     belongs_to  :creator, class_name: 'Iox::User', foreign_key: 'created_by'
     belongs_to  :updater, class_name: 'Iox::User', foreign_key: 'updated_by'
 
-
-    belongs_to :project
-    belongs_to :venue
-    belongs_to :person
+    belongs_to :fileable, polymorphic: true
 
     Paperclip.interpolates :rel_id do |attachment, style|
-      attachment.instance.project_id
+      attachment.instance.fileable_id
     end
 
     include Iox::FileObject

@@ -169,6 +169,24 @@ module Openeras
       render json: { item: @project, flash: flash, success: flash[:alert].blank? }
     end
 
+    def apply_file_settings
+      if @project = get_project
+        if can_modify?( @project )
+          @project.files.each do |file|
+            file.description = params[:file][:description]
+            file.copyright = params[:file][:copyright]
+            file.save
+          end
+          flash.now.notice = t('openeras.file.applying_successful', name: @project.title)
+        else
+          flash.now.alert = t('insufficient_rights')
+        end
+      else
+        flash.now.alert = t('not_found')
+      end
+      render json: { item: @project, flash: flash, success: flash[:alert].blank? }
+    end
+
     #
     # publish a project
     #

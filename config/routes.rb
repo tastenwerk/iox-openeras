@@ -7,6 +7,7 @@ MiniOpeneras::Engine.routes.draw do
       patch :translation
       patch :publish
       post :restore
+      patch :apply_file_settings
     end
   end
 

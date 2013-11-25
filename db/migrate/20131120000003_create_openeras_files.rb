@@ -8,9 +8,7 @@ class CreateOpenerasFiles < ActiveRecord::Migration
       t.string      :copyright
       t.integer     :position, default: 0
 
-      t.belongs_to  :project
-      t.belongs_to  :venue
-      t.belongs_to  :person
+      t.references  :fileable, polymorphic: true
 
       t.integer     :updated_by
       t.integer     :created_by

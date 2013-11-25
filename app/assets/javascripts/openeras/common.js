@@ -244,7 +244,11 @@ function setupFileUpload( item, $container ){
     done: function( e, data ){
       $(this).closest('.upload-container').removeClass('drop-here');
       var response = data._response.result;
-      item.files.push( response.item );
+      var file = response.item;
+      file.description = ko.observable(file.description);
+      file.copyright = ko.observable(file.copyright);
+      file.thumb_url = ko.observable(file.thumb_url);
+      item.files.push( file );
       setTimeout( function(){
         $('#files-progress .bar').css( 'width', 0 );
       }, 500 );
@@ -258,6 +262,22 @@ function setupFileUpload( item, $container ){
     }
   });
 
+  $(document).off('click', applyFileSettingsToAll)
+             .on('click', '.apply-file-settings-to-all', applyFileSettingsToAll);
+
+}
+
+function applyFileSettingsToAll( e ){
+  $.ajax({
+    url: '/openeras/projects/'+$(this).attr('data-project-id')+'/apply_file_settings',
+    data: $(this).closest('form').serializeArray(),
+    dataType: 'json',
+    type: 'patch'
+  }).done( function( response ){
+    if( response.success )
+      iox.Win.closeVisible();
+    iox.flash.rails( response.flash );
+  });
 }
 
 function setupProjectForm( response, $container ){

@@ -20,7 +20,7 @@ module Openeras
     has_many    :project_people, dependent: :destroy
     has_many    :people, through: :project_people
 
-    has_many    :files, dependent: :destroy
+    has_many    :files, as: :fileable, dependent: :destroy
 
     validates   :title, presence: true, length: { in: 2..255 }
     validates   :subtitle, length: { maximum: 255 }

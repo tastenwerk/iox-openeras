@@ -38,13 +38,18 @@
       <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#files"><%= t('openeras.project.files') %></a></li>
     </ul>
 
-    <div class="clearfix iox-content-padding">
+    <h3 class="iox-form-title">
+      <tt class="iox-form-pages">
+        (
+          <span class="item-num"></span>
+           / 
+          <span class="items-total"></span>
+        )
+      </tt>
+      <span data-bind="text: title"></span>
+    </h3>
 
-      <div class="content-padding">
-        <span class="item-num"></span>
-         / 
-        <span class="items-total"></span>
-      </div>
+    <div class="clearfix iox-content-padding">
 
       <form data-bind="submit: saveItem" class="iox-form openeras-project-form scrollable-content">
 

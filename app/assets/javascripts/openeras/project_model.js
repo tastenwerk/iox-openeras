@@ -15,6 +15,7 @@ function ProjectModel( attrs, _parent ){
     });
   }
   this.files = ko.observableArray( this.files || [] );
+  this.title = ko.observable( this.title );
 
   this.locale = ko.observable( this.locale );
   this.locale.subscribe( function( lang ){

@@ -95,3 +95,5 @@ de:
       description: "Beschreibung"
       copyright: "Copyright"
       settings: "Einstellungen"
+      apply_all: "Auf alle Dateien dieses Projektes anwenden"
+      applying_successful: "Einstellungen wurden auf alle Dateien von &raquo;%{name}&laquo; angewendet"
