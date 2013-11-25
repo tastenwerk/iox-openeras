@@ -20,7 +20,12 @@ MiniOpeneras::Engine.routes.draw do
     end
   end
 
-  resources :files
+  resources :files do
+    member do
+      post :coords
+    end
+  end
+  
   resources :prices
 
   resources :people

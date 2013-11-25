@@ -1,19 +1,57 @@
-<%= form_for @file, html: { class: 'iox-form content-padding' } do |f| %>
+<div class="iox-tabs vertical">
 
-  <%= f.submit 'save', class: 'hide' %>
+  <ul>
+    <li class="active"><a href="#general"><%= t('general') %></a></li>
+    <li><a href="#images"><%= t('openeras.file.images') %></a></li>
+  </ul>
 
-  <div class="field-box w-input">
-    <%= f.label t('openeras.file.description') %>
-    <%= f.text_field :description %>
+  <div class="clearfix">
+
+    <%= form_for @file, html: { class: 'iox-form content-padding' } do |f| %>
+
+      <%= f.submit 'save', class: 'hide' %>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.file.name') %>
+        <%= f.text_field :name %>
+      </div>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.file.description') %>
+        <%= f.text_field :description %>
+      </div>
+
+      <div class="field-box w-input">
+        <%= f.label t('openeras.file.copyright') %>
+        <%= f.text_field :copyright %>
+      </div>
+
+      <div class="iox-win-footer">
+        <a data-project-id="<%= @file.fileable_id %>" class="btn apply-file-settings-to-all" title="<%= t('openeras.file.apply_all_desc') %>"><%= t('openeras.file.apply_all') %></a>
+      </div>
+
+    <% end %>
+
   </div>
 
-  <div class="field-box w-input">
-    <%= f.label t('openeras.file.copyright') %>
-    <%= f.text_field :copyright %>
+  <div class="clearfix">
+  
+    <% Rails.configuration.iox.webfile_sizes.each_pair do |file_size, dimensions| %>
+
+      <% next if %w(thumb pdf_thumb original).include? file_size.to_s %>
+      <% next unless dimensions.include?('x') %>
+
+      <div class="cut-image-container">
+
+        <h6><%= file_size %></h6>
+
+        <div class="cutter" style="width: <%= dimensions.split('x')[0] %>px; height: <%= dimensions.split('x')[1].gsub(/[!#\>\<\^]/,'') %>px;">
+          <img data-file-id="<%= @file.id %>" data-file-size="<%= file_size %>" src="<%= @file.file.url(:original) %>" class="crop-img" style="<%= @file.get_offset_styles(file_size) %> <%= @file.get_dim_w_or_h( file_size ) %>" />
+        </div>
+      </div>
+
+    <% end %>
+
   </div>
 
-  <div class="iox-win-footer">
-    <a data-project-id="<%= @file.fileable_id %>" class="btn apply-file-settings-to-all"><%= t('openeras.file.apply_all') %></a>
-  </div>
-
-<% end %>
+</div>

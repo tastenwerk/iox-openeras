@@ -46,6 +46,21 @@ module Openeras
       render json: { flash: flash, success: flash[:alert].blank?, item: @file }
     end
 
+    def coords
+      if @file = Openeras::File.find_by_id( params[:id] )
+        @file.updater = current_user
+        @file.set_offset_styles( params[:size], params[:x], params[:y] )
+        if @file.save
+          flash.now.notice = t('openeras.file.coords_saved', name: @file.name, size: params[:size])
+        else
+          flash.now.alert = t('openeras.file.coords_saving_failed', name: @file.name, size: params[:size])
+        end
+      else
+        notify_404
+      end
+      render json: { flash: flash, success: flash[:alert].blank?, item: @file }
+    end
+
     def destroy
       success = false
       if @file = Openeras::File.find_by_id( params[:id] )
@@ -57,7 +72,7 @@ module Openeras
           flash.now.alert = t('deletion_failed')
         end
       else
-        flash.now.alert = t('not_found')
+        notify_404
       end
       render json: { flash: flash, success: success, item: @file }
     end

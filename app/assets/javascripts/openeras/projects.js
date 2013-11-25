@@ -84,3 +84,67 @@ function setupProjectsList( $kGrid ){
   $('.query').val('');
 
 }
+
+function setupProjectFileForm( $win ){
+  $win.find('form').on('submit', function(e){
+    e.preventDefault();
+    $.ajax({
+      url: $(this).attr('action'),
+      data: $(this).serializeArray(),
+      dataType: 'json',
+      type: 'patch'
+    }).done( function( response ){
+      if( response.success ){
+        var project = ko.dataFor( $('.iox-content:visible').get(0) );
+        project.files().forEach( function(file){
+          console.log('file', file);
+          if( file.id === response.item.id ){
+            file.description( response.item.description );
+            file.copyright( response.item.copyright );
+            file.thumb_url( response.item.thumb_url );
+          }
+        });
+        $win.data('ioxWin').close();
+      }
+      iox.flash.rails( response.flash );
+    });
+  });
+
+  $win.find('.apply-file-settings-to-all').on('click', applyFileSettingsToAll);
+
+  $win.find('.iox-tabs').ioxTabs({
+    activate: function(){ $win.center(); }
+  });
+
+  $win.find('.crop-img').ioxPositionImg();
+
+  $win.center();
+
+}
+
+function applyFileSettingsToAll( e ){
+  $.ajax({
+    url: '/openeras/projects/'+$(this).attr('data-project-id')+'/apply_file_settings',
+    data: $(this).closest('form').serializeArray(),
+    dataType: 'json',
+    type: 'patch'
+  }).done( function( response ){
+    if( response.success )
+      iox.Win.closeVisible();
+    iox.flash.rails( response.flash );
+  });
+}
+
+
+function removeProjectFile( item, e ){
+  $.ajax({
+    url: '/openeras/files/'+item.id,
+    type: 'delete',
+    dataType: 'json'
+  }).done( function( response ){
+    var project = ko.dataFor( $('.iox-content:visible').get(0) );
+    if( response.success )
+      project.files.remove( item );
+    iox.flash.rails( response.flash );
+  });
+}

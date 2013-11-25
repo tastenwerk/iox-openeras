@@ -7,6 +7,8 @@
 //= require 3rdparty/jquery.ui.widget
 //= require 3rdparty/jquery.iframe-transport
 //= require 3rdparty/jquery.fileupload
+//
+//= require iox/iox.positionImg
 
 
 /**
@@ -262,22 +264,6 @@ function setupFileUpload( item, $container ){
     }
   });
 
-  $(document).off('click', applyFileSettingsToAll)
-             .on('click', '.apply-file-settings-to-all', applyFileSettingsToAll);
-
-}
-
-function applyFileSettingsToAll( e ){
-  $.ajax({
-    url: '/openeras/projects/'+$(this).attr('data-project-id')+'/apply_file_settings',
-    data: $(this).closest('form').serializeArray(),
-    dataType: 'json',
-    type: 'patch'
-  }).done( function( response ){
-    if( response.success )
-      iox.Win.closeVisible();
-    iox.flash.rails( response.flash );
-  });
 }
 
 function setupProjectForm( response, $container ){

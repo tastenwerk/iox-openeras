@@ -8,6 +8,8 @@ class CreateOpenerasFiles < ActiveRecord::Migration
       t.string      :copyright
       t.integer     :position, default: 0
 
+      t.text      :offset_coords
+
       t.references  :fileable, polymorphic: true
 
       t.integer     :updated_by

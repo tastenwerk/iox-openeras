@@ -95,7 +95,7 @@
   margin-left: 5px
 }
 
-.upload-container .icon-plus{ 
+.upload-container .icon-upload{ 
   font-size: 40px; 
   line-height: 40px;
   color: #ddd; 
@@ -200,4 +200,19 @@
 #files-progress .bar{
   background-color: #3F95FF;
   height: 5px;
+}
+
+.cut-image-container{
+  margin: 20px;
+}
+
+.cutter{
+  position: relative;
+  overflow: hidden;
+}
+
+.cutter img.crop-img{
+  cursor: move;
+  position: absolute;
+  max-width: none;
 }
