@@ -10,7 +10,17 @@ module Openeras
         @prices.where("name LIKE ?", "%#{params[:query]}")
       end
       @total = @prices.count
-      render json: { items: @prices.load, total: @total }
+
+      @order = 'price asc'
+      if params[:sort]
+        sort = params[:sort]['0'][:field]
+        unless sort.blank?
+          @order = "#{sort} #{params[:sort]['0'][:dir]}"
+        end
+      end
+      @prices = @prices.order( @order )
+
+      render json: { items: @prices.load, total: @total, order: @order }
     end
 
     def create

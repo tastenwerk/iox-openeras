@@ -211,7 +211,7 @@ function setupDatesGrid( item, $container ){
       serverSorting: true,
       sort: { field: "updated_at", dir: "desc" }
     },
-    height: $(window).height()-240,
+    height: $(window).height()-260,
     selectable: "multiple",
     resizable: true,
     navigatable: true,

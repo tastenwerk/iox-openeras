@@ -325,6 +325,10 @@
       }
     });
 
+    $('#events-grid').delegate("tbody>tr", "dblclick", function(){
+      $(this).find('.k-grid-editProject').click();
+    });
+
     setupProjectsList( kGrid );
 
     window.openeras = window.openeras || {};

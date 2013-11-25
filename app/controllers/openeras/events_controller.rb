@@ -54,13 +54,16 @@ module Openeras
     end
 
     def destroy
-      @event = Event.find_by_id( params[:id] )
-      if @event.destroy
-        flash.now.notice = t('openeras.event.deleted', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : ''))
+      if @event = Event.find_by_id( params[:id] )
+        if @event.destroy
+          flash.now.notice = t('openeras.event.deleted', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : ''))
+        else
+          flash.now.alert = t('openeras.event.deletion_failed')
+        end
       else
-        flash.now.alert = t('openeras.event.deletion_failed')
+        notify_404
       end
-      render json: { flash: flash, item: @event }
+      render json: { flash: flash, item: @event, success: flash[:alert].blank? }
     end
 
     private

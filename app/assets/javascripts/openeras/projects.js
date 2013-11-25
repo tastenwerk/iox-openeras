@@ -28,7 +28,7 @@ function setupProjectsList( $kGrid ){
     if( lastSearch === $x )
       return;
     if($x)
-      $filter.push({ field:"x", operator:"contains", value:$x});
+      $filter.push({ field:"x", operator: "contains", value:$x});
     lastSearch = $x;
     $kGrid.data('kendoGrid').dataSource.filter($filter);
     if( $x.length > 0 )

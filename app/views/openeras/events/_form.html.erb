@@ -44,6 +44,10 @@
       </div>
 
       <div class="field-box w-input">
+        <div class="pull-right" style="margin: 3px 10px 0 0;">
+          <input type="checkbox" class="keep-open" />
+          <span class="desc"><%= t('keep_open') %></span>
+        </div>
         <%= f.label t('openeras.event.available_seats') %>
         <%= f.text_field :available_seats, size: 5 %>
       </div>

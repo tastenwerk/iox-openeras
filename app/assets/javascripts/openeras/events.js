@@ -1,5 +1,4 @@
 function setupEventWin( $win, persistedRecord ){
-  $win.find('.iox-tabs').ioxTabs();
   $win.find('.datetime').kendoDateTimePicker({
     format: 'yyyy-MM-dd HH:mm',
     dateFormat: "dd. MM. yyyy",
@@ -87,15 +86,26 @@ function setupEventWin( $win, persistedRecord ){
     }).done( function( response ){
       if( response.success ){
         $("#dates-grid").data('kendoGrid').dataSource.read();
-        if( !$win.find('.keep-open').is('checked') )
+        console.log( $win.find('.keep-open') )
+        if( $win.find('.keep-open').is(':checked') )
+          $win.unblock();
+        else
           iox.Win.closeVisible();
       }
       iox.flash.rails( response.flash );
+      iox.flash.urge( 2000 );
     });
   });
 
   if( persistedRecord )
     setupPricesGrid( $win );
+
+  $win.find('.iox-tabs').ioxTabs({
+    activate: function(){
+      $win.center();
+    }
+  });
+  $win.center();
 
 }
 
@@ -108,8 +118,14 @@ function setupPricesGrid( $win ){
   var pricesDataSource = new kendo.data.DataSource({
         transport: {
             read:  function( options ){
-              $.getJSON( pricesUrl, function( response ){
-                options.success( response.items )
+
+              $.ajax({
+                url: pricesUrl,
+                data: { sort: options.data.sort, filter: options.data.filter },
+                dataType: 'json',
+                type: 'get'
+              }).done( function( response ){
+                options.success( response )
               });
             },
             update: function( options ){
@@ -156,6 +172,8 @@ function setupPricesGrid( $win ){
         },
         batch: true,
         schema: {
+          total: 'total',
+          data: 'items',
           model: {
             id: 'id',
             fields: {
@@ -164,7 +182,11 @@ function setupPricesGrid( $win ){
               'price': { editable: true, type: 'number' }
             }
           }
-        }
+        },
+        serverPaging: true,
+        serverFiltering: true,
+        serverSorting: true,
+        sort: { field: "price", dir: "asc" }
     });
 
 
@@ -189,7 +211,7 @@ function setupPricesGrid( $win ){
     editable: {
       mode: "inline"
     },
-    resizable: true,
+    resizable: false,
     navigatable: true,
     sortable: true,
     pageable: {
