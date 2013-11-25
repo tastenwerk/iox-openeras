@@ -5,6 +5,8 @@ MiniOpeneras::Engine.routes.draw do
     resources :files
     member do
       patch :translation
+      patch :publish
+      post :restore
     end
   end
 

@@ -2,6 +2,25 @@
  * openeras common styles
  */
 
+.openeras-venues-list li .item,
+.openeras-labels-list li .item{
+  border-left-width: 0;
+}
+.openeras-venues-list li .item:hover,
+.openeras-venues-list li .item.selected,
+.openeras-labels-list li .item.selected,
+.openeras-labels-list li .item:hover{
+  background-color: #2AABD6;
+  color: #fff;
+}
+
+.openeras-labels-list li .item.selected a.title,
+.openeras-labels-list li .item:hover a.title,
+.openeras-venues-list li .item.selected a.title,
+.openeras-venues-list li .item:hover a.title{
+  color: #fff;
+}
+
 .openeras-venues-list .remove-item,
 .openeras-labels-list .remove-item{
   visibility: hidden;
@@ -20,6 +39,14 @@
 .openeras-venues-list .item:hover .remove-item,
 .openeras-labels-list .item:hover .remove-item{
   visibility: visible;
+}
+
+#events-grid .publish-button{
+  cursor: pointer;
+}
+
+.scrollable-content.iox-form.openeras-project-form{
+  top: 100px;
 }
 
 .openeras-project-form .select2{

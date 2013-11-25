@@ -260,7 +260,7 @@ function setupFileUpload( item, $container ){
 
 }
 
-function setupContainer( response, $container ){
+function setupProjectForm( response, $container ){
   ko.cleanNode( $container.get(0) );
   var item = new ProjectModel( response );
   ko.applyBindings( item, $container.get(0) );
@@ -271,6 +271,14 @@ function setupContainer( response, $container ){
     setupDatesGrid( item, $container );
     setupCKEDITOR( $container.find('.editor') );
     setupFileUpload( item, $container );
+
+    var page = $('#events-grid').data('kendoGrid').dataSource.page();
+    var pageSize = $('#events-grid').data('kendoGrid').dataSource.pageSize();
+    var total = $('#events-grid').data('kendoGrid').dataSource.total();
+    var index = $('#events-grid').data('kendoGrid').dataSource.indexOf( $('#events-grid').data('kendoGrid').dataSource.get( item.id ) );
+    $container.find('.item-num').text( (page-1)*pageSize + index + 1 );
+    $container.find('.items-total').text( $('#events-grid').data('kendoGrid').dataSource.total() );
+
   }
   $container.find('input[type=text]:visible:first').focus();
 }

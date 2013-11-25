@@ -1,0 +1,2 @@
+$('#events-grid').data('kendoGrid').dataSource.add(<%= raw @project.to_json %>);
+iox.flash.rails(<%= raw flash.to_json %>);

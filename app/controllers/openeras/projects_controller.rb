@@ -184,9 +184,9 @@ module Openeras
             @published = false
             if @project.published?
               @published = true
-              flash.now.notice = t('project.has_been_published', name: @project.title)
+              flash.now.notice = t('openeras.project.has_been_published', name: @project.title)
             else
-              flash.now.notice = t('project.has_been_unpublished', name: @project.title)
+              flash.now.notice = t('openeras.project.has_been_unpublished', name: @project.title)
             end
 
             Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: (@published ? 'published' : 'unpublished'), icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: projects_path(@project)
@@ -206,9 +206,9 @@ module Openeras
         if can_modify?( @project )
           if @project.delete
             Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: 'deleted', icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: projects_path(@project)
-            flash.now.notice = t('project.deleted', name: @project.title, id: @project.id )
+            flash.now.notice = t('openeras.project.deleted', name: @project.title, id: @project.id )
           else
-            flash.now.alert = t('project.deletion_failed', name: @project.title)
+            flash.now.alert = t('openeras.project.deletion_failed', name: @project.title)
           end
         end
       else
@@ -218,19 +218,18 @@ module Openeras
     end
 
     def restore
-      if @project = get_project
+      if @project = Project.unscoped.find_by_id( params[:id] )
         if can_modify?( @project )
           if @project.restore
             Iox::Activity.create! user_id: current_user.id, obj_name: @project.title, action: 'restored', icon_class: 'icon-calendar', obj_id: @project.id, obj_type: @project.class.name, obj_path: projects_path(@project)
-            flash.now.notice = t('project.restored', name: @project.title)
+            flash.now.notice = t('openeras.project.restored', name: @project.title)
           else
-            flash.now.alert = t('project.failed_to_restore', name: @project.title)
+            flash.now.alert = t('openeras.project.failed_to_restore', name: @project.title)
           end
         end
       else
         flash.now.alert = t('not_found')
       end
-      render json: { item: @project, success: !flash[:notice].blank?, flash: flash }
     end
 
     private

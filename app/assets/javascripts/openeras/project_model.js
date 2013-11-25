@@ -58,6 +58,92 @@ function ProjectModel( attrs, _parent ){
  */
 ProjectModel.prototype.removeItem = function removeItem( item ){
 
+  $.ajax({
+    url: '/openeras/projects/'+item.id,
+    type: 'delete',
+    dataType: 'json'
+  }).done( function(json){
+    iox.flash.rails(json.flash);
+    dataSource = $('#events-grid').data('kendoGrid').dataSource;
+    if( json.success ){
+      dataSource.remove( dataSource.get( item.id ) );
+      iox.switchContent('back');
+    }
+  }).fail( function(json){
+    iox.flash.rails(json.flash);
+  });
+
+}
+
+/**
+ * publish/unpublish this item
+ */
+ProjectModel.prototype.publishItem = function publishItem( item, e ){
+  $elem = $(e.target).hasClass('publish-button') ? $(e.target) : $(e.target).find('.publish-button');
+  publishProject.call( $elem, item, true );
+}
+
+ProjectModel.prototype.selectItem = function selectItem( kGrid, $row, item, next ){
+
+  if( item ){
+    item = item.toJSON();
+    item.id = kGrid.dataItem( $row ).id;
+    setupProjectForm( item, $('.iox-content:visible') );
+    console.log( $row );
+    kGrid.clearSelection();
+    kGrid.select( $row );
+  }
+  else
+    if( next )
+      iox.flash.notice('Ende erreicht');
+    else
+      iox.flash.notice('Anfang erreicht');
+
+}
+/**
+ * loads next item from underlying grid
+ */
+ProjectModel.prototype.loadNextItem = function loadNextItem( item, e ){
+  e.preventDefault();
+  var self = this;
+  var kGrid = $('#events-grid').data('kendoGrid');
+  var $row = kGrid.select().next('tr[role=row]');
+  var nextItem = kGrid.dataItem( $row );
+  // try loading next page if there are more pages
+  if( !nextItem && kGrid.dataSource.page() < kGrid.dataSource.totalPages() ){
+    kGrid.dataSource.page( kGrid.dataSource.page()+1);
+    kGrid.dataSource.fetch( function(){
+      setTimeout( function(){
+        $row = $('#events-grid').find('tr[role=row]:first');
+        nextItem = kGrid.dataItem( $row );
+        self.selectItem( kGrid, $row, nextItem, true)
+      }, 50);
+    })
+  } else
+    self.selectItem( kGrid, $row, nextItem, true)
+}
+
+/**
+ * loads previous item from underlying grid
+ */
+ProjectModel.prototype.loadPrevItem = function loadPrevItem( item, e ){
+  e.preventDefault();
+  var self = this;
+  var kGrid = $('#events-grid').data('kendoGrid');
+  var $row = kGrid.select().prev('tr[role=row]');
+  var prevItem = kGrid.dataItem( $row );
+  // try loading next page if there are more pages
+  if( !prevItem && kGrid.dataSource.page()-1 > 0 ){
+    kGrid.dataSource.page( kGrid.dataSource.page()-1);
+    kGrid.dataSource.fetch( function(){
+      setTimeout( function(){
+        $row = $('#events-grid').find('tr[role=row]:last');
+        prevItem = kGrid.dataItem( $row );
+        self.selectItem( kGrid, $row, prevItem )
+      }, 50);
+    })
+  } else
+    self.selectItem( kGrid, $row, prevItem )
 }
 
 /**
@@ -87,7 +173,7 @@ ProjectModel.prototype.saveItem = function saveItem( form ){
     iox.flash.rails( response.flash );
     if( response.success ){
       if(!( this.id && this.id > 0 ) )
-        setupContainer( response.item, $('.iox-content:visible') );
+        setupProjectForm( response.item, $('.iox-content:visible') );
       $('#events-grid').data('kendoGrid').dataSource.read();
     }
 

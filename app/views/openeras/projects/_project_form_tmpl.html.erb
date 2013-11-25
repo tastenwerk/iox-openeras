@@ -7,21 +7,27 @@
 
       <a href="#" data-role="switchBackContent" class="btn" title="<%= t('back_to_list') %>"><i class="icon-list-alt"></i></a>
 
-      <a href="#" data-role="loadPrevFromUnderlyingList" class="btn" title="<%= t('next_entry') %>"><i class="icon-arrow-circle-right"></i></a>
+      <a href="#" data-bind="click: loadNextItem" class="btn" title="<%= t('next_entry') %>"><i class="icon-arrow-circle-right"></i></a>
 
-      <a href="#" data-role="loadNextFromUnderlyingList" title="<%= t('previous_entry') %>" class="btn"><i class="icon-arrow-circle-left"></i></a>
+      <a href="#" data-bind="click: loadPrevItem" title="<%= t('previous_entry') %>" class="btn"><i class="icon-arrow-circle-left"></i></a>
 
       <a href="#" data-bind="click: saveItem" class="btn btn-primary" title="<%= t('save') %>"><span class="icon-save"></span>&nbsp; <%= t('save') %></a>
 
+      <a class="btn" data-bind="click: publishItem" title="<%= t("openeras.project.view") %>">
+        <!-- ko if: published -->
+        <i class="icon-ok-sign icon published publish-button"></i>
+        <!-- /ko -->
+        <!-- ko ifnot: published -->
+        <i class="icon-ban-circle icon publish-button"></i>
+        <!-- /ko -->
+      </a>
+
     <% end %>
-
-  </div>
-
-  <div class="webpage-head-control iox-form-control">
 
     <a class="btn" data-bind=" attr: { href: '/openeras/projects/'+id }" title="<%= t("openeras.project.view") %>"><i class="icon-eye icon"></i></a>
 
   </div>
+
 
   <div class="iox-tabs openeras-project-tabs">
 
@@ -34,7 +40,13 @@
 
     <div class="clearfix iox-content-padding">
 
-      <form data-bind="submit: saveItem" style="margin-top: 40px;" class="iox-form openeras-project-form scrollable-content">
+      <div class="content-padding">
+        <span class="item-num"></span>
+         / 
+        <span class="items-total"></span>
+      </div>
+
+      <form data-bind="submit: saveItem" class="iox-form openeras-project-form scrollable-content">
 
         <div class="field-box w-input required">
           <label for="title"><%= t('openeras.project.title') %></label>

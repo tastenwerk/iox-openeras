@@ -116,6 +116,7 @@
      */
     $('#labels-list').ioxTree({
       url: '/openeras/labels/projects',
+      deletionURL: '/openeras/labels',
       template: 'labels-tree-template',
       observe: ['name', 'color'],
       control: $('.labels-list-control'),
@@ -124,8 +125,8 @@
       },
       events: {
         afterRemove: function afterRemove( item ){
-          $('.iox-details-placeholder').show();
-          $('.iox-content-frame').hide();
+          $('#projects-query').val('');
+          $('#submit-projects-query').click();
         },
         item: {
 
@@ -198,6 +199,10 @@
         noEntriesFound: '<%= t('filter_no_entries_found') %>'
       },
       events: {
+        afterRemove: function afterRemove( item ){
+          $('#projects-query').val('');
+          $('#submit-projects-query').click();
+        },
         item: {
 
           /**
@@ -245,9 +250,12 @@
             { name: 'editProject',
               text: '<i class="icon-edit"></i>',
               click: function(e){
-                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                var $row = $(e.currentTarget).closest("tr");
+                var dataItem = this.dataItem( $row );
+                this.clearSelection();
+                this.select( $row );
                 iox.switchContent( 'next', function( $container ){
-                  setupContainer( ko.toJS(dataItem), $container );
+                  setupProjectForm( ko.toJS(dataItem), $container );
                 });
               }
             },

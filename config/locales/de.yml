@@ -46,8 +46,8 @@ de:
       has_been_published: "Projekt &raquo;%{name}&laquo; wurde veröffentlicht"
       has_been_unpublished: "Veröffentlichung von &raquo;%{name}&laquo; wurde zurückgezogen"
       delete: "Projekt löschen"
-      deleted: "Projekt &raquo;%{name}&laquo; wurde gelöscht <a href='/openeras/projects/%{id}/restore' data-method='post' data-remote='true'><i class='flash-icon icon-undo'></i>Wiederherstellen</a>"
-
+      deleted: "Projekt &raquo;%{name}&laquo; wurde gelöscht <a href='/openeras/projects/%{id}/restore' data-method='post' data-remote='true'><i class='flash-icon icon-undo'></i> Wiederherstellen</a>"
+      restored: "Project &raquo;%{name}&laquo; wurde wiederhergestellt"
       dates: "Termine"
 
     event:

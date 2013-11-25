@@ -1,3 +1,24 @@
+function publishProject( node, reload ){
+  var $elem = $(this);
+  node.published = !node.published;
+  $.ajax({ url: '/openeras/projects/'+node.id+'/publish?publish='+(node.published ? 'true' : 'false'),
+           type: 'patch',
+           dataType: 'json',
+           data: { publish: $(this).hasClass('on') },
+           success: function( data ){
+             iox.flash.rails( data.flash );
+             if( data.success )
+              if( data.item.published ){
+                $elem.addClass('icon-ok-sign').removeClass('icon-ban-circle');
+                if( reload )
+                  $('#events-grid').data('kendoGrid').dataSource.read();
+              }
+              else
+                $elem.removeClass('icon-ok-sign').addClass('icon-ban-circle');
+           }
+  });
+}
+
 function setupProjectsList( $kGrid ){
 
   function queryResults(e){
@@ -16,23 +37,9 @@ function setupProjectsList( $kGrid ){
       $('.iox-grid-header .clear-query').fadeOut();
   }
 
-  $(document).on('click', '.publish-button', function(){
-    var $elem = $(this);
-    var node = kGrid.data('kendoGrid').dataItem( $(this).closest('tr').get(0) );
-    node.published = !node.published;
-    $.ajax({ url: '/openeras/projects/'+node.id+'/publish?publish='+(node.published ? 'true' : 'false'),
-             type: 'put',
-             dataType: 'json',
-             data: { publish: $(this).hasClass('on') },
-             success: function( data ){
-               iox.flash.rails( data.flash );
-               if( data.success )
-                if( data.item.published )
-                  $elem.addClass('icon-ok-sign').removeClass('icon-ban-circle');
-                else
-                  $elem.removeClass('icon-ok-sign').addClass('icon-ban-circle');
-             }
-    });
+  $(document).on('click', '.k-grid-content .publish-button', function( e ){
+    var node = $kGrid.data('kendoGrid').dataItem( $(this).closest('tr').get(0) );
+    publishProject.call( this, node );
   });
 
   /**
@@ -45,7 +52,7 @@ function setupProjectsList( $kGrid ){
       $container.block();
       $.getJSON( '/openeras/projects/new?init_label_id='+selectedLabelId(),
         function( response ){
-          setupContainer( response, $container );
+          setupProjectForm( response, $container );
           $container.unblock();
       });
     });
