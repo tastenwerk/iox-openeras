@@ -13,15 +13,6 @@ module Openeras
       @event = Event.new event_params
       if @event.save
         flash.now.notice = t('openeras.event.saved', starts: l(@event.starts_at, format: :short), venue: (@event.venue ? @event.venue.name : '') )
-        @project = @event.project
-        if @project.starts_at.blank? || @event.starts_at.nil? || @event.starts_at < @project.starts_at
-          @project.starts_at = @event.starts_at
-          @project.save
-        end
-        if @project.ends_at.nil? || @event.starts_at > @project.ends_at
-          @project.ends_at = @event.starts_at
-          @project.save
-        end
       else
         flash.now.alert = t('openeras.event.saving_failed')
       end

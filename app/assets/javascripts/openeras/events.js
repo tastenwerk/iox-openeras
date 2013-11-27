@@ -113,7 +113,6 @@ function getDuration( starts_at ){
   var duration;
   if( $('#project-duration').length )
     duration = parseInt($('#project-duration').val());
-  console.log('duration', duration, starts_at);
   if( typeof(duration) === 'number' )
     return moment( starts_at ).add('m', duration ).toDate();
   return moment( starts_at ).add('h',2).toDate();
@@ -125,7 +124,6 @@ function setupEventWin( $win, persistedRecord ){
     dateFormat: "dd. MM. yyyy",
     timeFormat: "HH:mm",
     change: function( e ){
-      console.log('change');
       if( this.element.attr('id') === 'event_starts_at' ){
         var endsAt = $win.find('#event_ends_at');
         endsAt.data('kendoDateTimePicker').value( getDuration( this.value() ) );
@@ -207,7 +205,6 @@ function setupEventWin( $win, persistedRecord ){
     }).done( function( response ){
       if( response.success ){
         $("#dates-grid").data('kendoGrid').dataSource.read();
-        console.log( $win.find('.keep-open') )
         if( $win.find('.keep-open').is(':checked') )
           $win.unblock();
         else
@@ -284,8 +281,10 @@ function setupPricesGrid( $win ){
                 dataType: 'json',
                 data: { price: options.data.models[0] }
               }).done( function( response ){
-                if( response.success )
+                if( response.success ){
                   options.success();
+                  pricesDataSource.read();
+                }
                 else
                   options.error();
               });

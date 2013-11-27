@@ -82,6 +82,5 @@ module Openeras
       end
     end
 
-
   end
 end

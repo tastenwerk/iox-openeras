@@ -97,7 +97,6 @@ function setupProjectFileForm( $win ){
       if( response.success ){
         var project = ko.dataFor( $('.iox-content:visible').get(0) );
         project.files().forEach( function(file){
-          console.log('file', file);
           if( file.id === response.item.id ){
             file.description( response.item.description );
             file.copyright( response.item.copyright );

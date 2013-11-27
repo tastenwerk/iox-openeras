@@ -52,7 +52,6 @@ function setupLabelsSelectors( $container ){
         serverFiltering: true,
         transport: {
           read: function( options ){
-            console.log(options);
             var q = '';
             if( options.data.filter.filters.length > 0 )
               q = options.data.filter.filters[0].value;
