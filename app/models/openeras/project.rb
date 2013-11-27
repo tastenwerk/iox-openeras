@@ -31,13 +31,6 @@ module Openeras
 
     accepts_nested_attributes_for :translations
 
-    def authors
-      if a = people.where("openeras_project_people.function='author'").load
-        return a
-      end
-      return []
-    end
-
     def venue_name
       names = []
       if events && events.size > 0 
@@ -46,16 +39,6 @@ module Openeras
         end
       end
       names.join(',')
-    end
-
-
-
-    def authors=(names)
-      names.split(',').each do |author_name|
-        person = Openeras::Person.where(name: author_name).first
-        person = Openeras::Person.create(name: author_name) unless person
-        project_people.create! person: person, function: 'author'
-      end
     end
 
     def translation
@@ -80,7 +63,6 @@ module Openeras
       h = super(options)
       h[:venue_id] = venue_id
       h[:venue_name] = venue_name
-      h[:authors] = authors
       h[:translation] = translation
       h[:translations] = translations
       h[:locale] = locale || I18n.locale
