@@ -121,7 +121,6 @@ module Openeras
             @project.update_label_ids
             
             trans = @project.translations.where(locale: params[:project][:translation][:locale]).first
-            puts "trans: #{trans.locale if trans}"
             if trans
               trans.update translation_params
             else
@@ -132,7 +131,9 @@ module Openeras
 
             flash.now.notice = t('saved', name: @project.title)
           else
-            flash.now.alert = t('saving_failed', name: @project.title)
+            logger.error "Error when trying to save @project"
+            logger.error @project.errors.full_messages
+            flash.now.alert = t('saving_failed_w_msg', name: @project.title, msg: @project.errors.full_messages.join(',') )
           end
         else
           flash.now.alert('insufficient_rights')

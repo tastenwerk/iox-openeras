@@ -169,6 +169,14 @@ function setupProjectForm( response, $container ){
     setupCKEDITOR( $container.find('.editor') );
     setupFileUpload( item, $container );
 
+    $container.find('#project-age').kendoNumericTextBox({
+      format: "# Jahren"
+    });
+
+    $container.find('#project-duration').kendoNumericTextBox({
+      format: "# Minuten"
+    });
+
     var page = $('#events-grid').data('kendoGrid').dataSource.page();
     var pageSize = $('#events-grid').data('kendoGrid').dataSource.pageSize();
     var total = $('#events-grid').data('kendoGrid').dataSource.total();

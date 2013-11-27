@@ -80,6 +80,16 @@
         </div>
 
         <div class="field-box w-input">
+          <label for="title"><%= t('openeras.project.age') %></label>
+          <input type="text" id="project-age" placeholder="<%= t('openeras.project.age_placeholder') %>" name="project[age]" data-bind="value: age" class="numeric-select" />
+        </div>
+
+        <div class="field-box w-input">
+          <label for="title"><%= t('openeras.project.duration') %></label>
+          <input type="text" id="project-duration" placeholder="<%= t('openeras.project.duration_placeholder') %>" name="project[duration]" data-bind="value: duration" class="numeric-select" />
+        </div>
+
+        <div class="field-box w-input">
           <label for="title"><%= t('openeras.labels.title') %></label>
           <select id="project-labels" name="project[label_ids]" class="project-labels" data-bind="options: labels, optionsText: 'name', optionsValue: 'id', selectedOptions: labels" />
           <a class="btn new-label" title="<%= t('openeras.label.new') %>" data-prompt-text="<%= t('openeras.label.give_name') %>">

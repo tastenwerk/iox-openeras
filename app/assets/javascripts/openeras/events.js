@@ -109,20 +109,30 @@ function setupDatesGrid( item, $container ){
 
 }
 
+function getDuration( starts_at ){
+  var duration;
+  if( $('#project-duration').length )
+    duration = parseInt($('#project-duration').val());
+  console.log('duration', duration, starts_at);
+  if( typeof(duration) === 'number' )
+    return moment( starts_at ).add('m', duration ).toDate();
+  return moment( starts_at ).add('h',2).toDate();
+}
+
 function setupEventWin( $win, persistedRecord ){
   $win.find('.datetime').kendoDateTimePicker({
     format: 'yyyy-MM-dd HH:mm',
     dateFormat: "dd. MM. yyyy",
     timeFormat: "HH:mm",
     change: function( e ){
+      console.log('change');
       if( this.element.attr('id') === 'event_starts_at' ){
         var endsAt = $win.find('#event_ends_at');
-        if( moment( this.value() ) >= moment( endsAt.val() ) )
-          endsAt.data('kendoDateTimePicker').value( moment( this.value() ).add('h',2).toDate() );
+        endsAt.data('kendoDateTimePicker').value( getDuration( this.value() ) );
       } else {
         var startsAt = $win.find('#event_starts_at');
         if( startsAt.data('kendoDateTimePicker').value() >= this.value() )
-          this.value( moment( startsAt.data('kendoDateTimePicker').value() ).add('h',2).toDate() );
+          this.value( getDuration( startsAt.data('kendoDateTimePicker').value() ) );
       }
     }
   }).on('click', function(){
