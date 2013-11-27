@@ -27,7 +27,7 @@ module Openeras
       @event = Event.find_by_id( params[:event_id] )
       @price = @event.prices.build price_params
       if @price.save
-        @event.event_prices.create! price_id: @price.id
+        @event.event_prices.create!( price_id: @price.id ) unless @event.event_prices.where( price_id: @price.id ).first
         flash.now.notice = t('openeras.price.saved')
       else
         flash.now.alert = t('openeras.price.saving_failed')
@@ -51,7 +51,7 @@ module Openeras
         next if event.id == @event.id
         event.event_prices.delete_all
         @event.prices.each do |price|
-          event.event_prices.create! price_id: price.id
+          event.event_prices.create!( price_id: price.id ) unless event.event_prices.where( price_id: price.id ).first
         end
       end
       flash.now.notice = t('openeras.price.project_updated', name: @event.project.title)
