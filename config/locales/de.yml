@@ -16,11 +16,22 @@ de:
       new: "Neues Label"
       give_name: "Name des neuen Labels"
 
+    person:
+      new: "Neue Person"
+      function: "Funktion"
+      name: "Name"
+      saved: "Person &raquo;%{name}&laquo; wurde gespeichert"
+      saving_failed: "Person konnte nicht gespeichert werden"
+      removed: "Person &raquo;%{name}&laquo; wurde gelöscht"
+      removing_failed: "Person &raquo;%{name}&laquo; konnte nicht gelöscht werden"
+
     project:
       new: "Neues Projekt"
       title: "Projekttitel"
       subtitle: "Untertitel"
       authors: "Autor(en)"
+      ensemble: "Ensemble"
+      country: "Land"
       meta_description: "Kurzbeschreibung"
       meta_description_desc: "Diese Beschreibung wird bei Kurzinfos und von Suchmaschinen verwendet. Maximal 255 Zeichen"
       meta_keywords: "Schlagwörter"
@@ -36,7 +47,8 @@ de:
       location: "Spielort"
       files: "Medien"
 
-      text_and_langs: "Text / Sprachen"
+      text_and_langs: "Beschreibung"
+      cast: "Mitwirkende"
       body: "Textkörper"
 
       lang: "Sprache"
@@ -49,6 +61,9 @@ de:
       deleted: "Projekt &raquo;%{name}&laquo; wurde gelöscht <a href='/openeras/projects/%{id}/restore' data-method='post' data-remote='true'><i class='flash-icon icon-undo'></i> Wiederherstellen</a>"
       restored: "Project &raquo;%{name}&laquo; wurde wiederhergestellt"
       dates: "Termine"
+
+      removed_person: "Funktion von &raquo;%{name}&laquo; wurde gelöscht"
+      removing_person_failed: "Funktion von &raquo;%{name}&laquo; konnte nicht gelöscht werden"
 
     event:
       new: "Neuer Termin"

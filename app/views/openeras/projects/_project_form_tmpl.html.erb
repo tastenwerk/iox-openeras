@@ -34,6 +34,7 @@
     <ul>
       <li class="active"><a href="#general"><%= t('openeras.project.general') %></a></li>
       <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#content"><%= t('openeras.project.text_and_langs') %></a></li>
+      <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#cast"><%= t('openeras.project.cast') %></a></li>
       <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#dates"><%= t('openeras.project.dates') %></a></li>
       <li data-bind="css: { disabled: (!id || id.length < 1 ) }"><a href="#files"><%= t('openeras.project.files') %></a></li>
     </ul>
@@ -66,6 +67,16 @@
         <div class="field-box w-input">
           <label for="title"><%= t('openeras.project.authors') %></label>
           <input type="text" name="project[authors]" class="project-authors select2" data-bind="value: author_names" />
+        </div>
+
+        <div class="field-box w-input">
+          <label for="title"><%= t('openeras.project.ensemble') %></label>
+          <input type="text" name="project[ensemble_name]" data-bind="value: ensemble_name" />
+        </div>
+
+        <div class="field-box w-input">
+          <label for="title"><%= t('openeras.project.country') %></label>
+          <input type="text" name="project[country]" data-bind="value: country" />
         </div>
 
         <div class="field-box w-input">
@@ -116,6 +127,16 @@
         </div>
 
       </form>
+
+    </div>
+
+    <div class="clearfix iox-content-padding hide">
+
+      <div class="iox-grid-header clearfix">
+        <a class="add-person btn" title="<%= t('openeras.person.new') %>"><i class="icon-plus"></i></a>
+      </div>
+
+      <div id="people-grid" class="iox-k-grid"></div>
 
     </div>
 

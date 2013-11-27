@@ -13,6 +13,10 @@ class CreateOpenerasProjects < ActiveRecord::Migration
       t.text            :url
 
       t.integer         :organizer_id
+
+      t.string          :ensemble_name
+      t.string          :country
+      
       t.string          :coproduction
 
       t.string          :youtube_url

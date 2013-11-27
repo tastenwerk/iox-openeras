@@ -216,7 +216,7 @@ module Openeras
       else
         flash.now.alert = t('not_found')
       end
-      render :json => { flash: flash, item: @project, success: !flash.notice.blank? }
+      render :json => { flash: flash, item: @project, success: flash[:alert].blank? }
     end
 
     def destroy

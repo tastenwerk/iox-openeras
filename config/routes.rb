@@ -3,6 +3,8 @@ MiniOpeneras::Engine.routes.draw do
   resources :projects do
     resources :events
     resources :files
+    resources :people
+    resources :project_people
     member do
       patch :translation
       patch :publish

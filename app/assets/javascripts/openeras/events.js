@@ -1,3 +1,114 @@
+function setupDatesGrid( item, $container ){
+  var kGrid = $("#dates-grid").kendoGrid({
+    columns: [
+      { field: 'starts_at', title: 'von',
+        format: '{0:dd.MM.yyyy}',
+        width: 120
+      },
+      { field: 'starts_at', title: 'von',
+        format: '{0:HH:mm}',
+        width: 60
+      },
+      { field: 'ends_at', title: 'bis',
+        format: '{0:HH:mm}',
+        width: 80
+      },
+      { field: "venue_name",
+        title: 'Spielort',
+        sortable: false
+      },
+      { field: 'updated_at',
+        title: 'aktualisiert',
+        format: '{0:dd.MM.yyyy HH:mm}',
+        width: 120,
+        attributes: {
+          style: 'text-align: right'
+        }
+      },
+      { command:
+        [
+          { name: 'editEvent',
+            text: '<i class="icon-edit"></i>',
+            click: function(e){
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+              new iox.Win({
+                url: '/openeras/events/'+dataItem.id+'/edit',
+                completed: function($win){
+                  setupEventWin( $win, true );
+                },
+                saveFormBtn: true,
+                title: 'Termin bearbeiten'
+              });
+            }
+          },
+          { name: 'deleteEvent', text: '<i class="icon-remove"></i>',
+            click: function(e){
+              var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+              $.ajax({
+                url: '/openeras/events/'+ dataItem.id,
+                type: 'delete',
+                dataType: 'json'
+              }).done( function(json){
+                iox.flash.rails(json.flash);
+                if( json.success )
+                  kGrid.data('kendoGrid').removeRow( $(e.target).closest('tr') );
+              }).fail( function(json){
+                iox.flash.rails(json.flash);
+              });
+            }
+          }
+        ],
+        width: 140
+      }
+    ],
+    dataSource: {
+      type: "json",
+      transport: {
+        read: {
+          url: '/openeras/projects/'+item.id+'/events',
+          dataType: 'json',
+          data: function(){
+            return {  };
+          }
+        }
+      },
+      schema: {
+        total: 'total',
+        data: function(response) {
+          return response.items;
+        },
+        model: {
+          fields: {
+            id: { type: 'number' },
+            published: { type: 'boolean' },
+            title: { type: 'string' },
+            venue_name: { type: 'string' },
+            starts_at: { type: 'date' },
+            ends_at: { type: 'date' },
+            updater_name: { type: 'string' },
+            updated_at: { type: 'date', width: 110 }
+          }
+        }
+      },
+      serverPaging: true,
+      serverFiltering: true,
+      serverSorting: true,
+      sort: { field: "updated_at", dir: "desc" }
+    },
+    height: $(window).height()-260,
+    selectable: "multiple",
+    resizable: true,
+    navigatable: true,
+    sortable: true,
+    pageable: {
+      refresh: true,
+      pageSize: 30,
+      pageSizes: [10, 30, 50, 100]
+    }
+  });
+
+}
+
 function setupEventWin( $win, persistedRecord ){
   $win.find('.datetime').kendoDateTimePicker({
     format: 'yyyy-MM-dd HH:mm',
