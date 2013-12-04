@@ -15,7 +15,9 @@ module Openeras
     has_many :prices, through: :event_prices
 
     before_save :update_start_end_time
-    after_save :set_default_prices, :update_project_start_end_dates
+    after_save :update_project_start_end_dates
+    after_create :set_default_prices
+    after_destroy :clean_project_start_end_dates
 
     validate :starts_at, presence: true
     validate :ends_at, presence: true
@@ -47,6 +49,22 @@ module Openeras
       project.starts_at = starts_at if( project.starts_at.nil? || starts_at < project.starts_at )
       project.ends_at = ends_at if( project.ends_at.nil? || ends_at > project.ends_at )
       project.save
+    end
+
+    def clean_project_start_end_dates
+      project.reload
+      return if project.starts_at != starts_at && project.ends_at != ends_at
+      if project.events.size < 1
+        project.starts_at = nil
+        project.ends_at = nil
+      else
+        if project.starts_at == starts_at
+          project.starts_at = project.events.order(:starts_at).first.starts_at
+        end
+        if project.ends_at == ends_at
+          project.ends_at = project.events.order(:ends_at).last.ends_at
+        end
+      end
     end
 
   end

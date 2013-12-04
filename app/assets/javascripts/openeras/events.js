@@ -352,7 +352,7 @@ function setupPricesGrid( $win ){
         dataType: 'json',
         type: 'post'
       }).done( function( response ){
-        alert(response.flash[0][1]);
+        iox.flash.rails(response.flash).urge( 2000 );
       });
     }
   });
@@ -364,7 +364,19 @@ function setupPricesGrid( $win ){
         dataType: 'json',
         type: 'post'
       }).done( function( response ){
-        alert(response.flash[0][1]);
+        iox.flash.rails(response.flash).urge( 2000 );
+      });
+    }
+  });
+
+  $win.find('.apply-systemwide').on('click', function(){
+    if( confirm('Diese Liste wirklich auf sämtliche zukünftige Termine anwenden?') ){
+      $.ajax({
+        url: pricesUrl+'/apply_systemwide',
+        dataType: 'json',
+        type: 'post'
+      }).done( function( response ){
+        iox.flash.rails(response.flash).urge( 2000 );
       });
     }
   });

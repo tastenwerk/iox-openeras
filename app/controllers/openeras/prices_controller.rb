@@ -58,6 +58,19 @@ module Openeras
       render json: { flash: flash, success: flash[:alert].blank? }
     end
 
+    def apply_systemwide
+      @event = Event.find_by_id( params[:event_id] )
+      Event.where("starts_at >= ?", Time.now).each do |event|
+        next if event.id == @event.id
+        event.prices.map(&:destroy)
+        @event.prices.each do |price|
+          event.event_prices.create!( price_id: price.id ) unless event.event_prices.where( price_id: price.id ).first
+        end
+      end
+      flash.now.notice = t('openeras.price.systemwide_updated', name: @event.project.title)
+      render json: { flash: flash, success: flash[:alert].blank? }
+    end
+
     def make_template
       @event = Event.find_by_id( params[:event_id] )
       oldprices = Price.where(template: true).each{ |p| p.update template: false }

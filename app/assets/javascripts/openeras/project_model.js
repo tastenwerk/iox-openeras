@@ -90,7 +90,6 @@ ProjectModel.prototype.selectItem = function selectItem( kGrid, $row, item, next
     item = item.toJSON();
     item.id = kGrid.dataItem( $row ).id;
     setupProjectForm( item, $('.iox-content:visible') );
-    console.log( $row );
     kGrid.clearSelection();
     kGrid.select( $row );
   }
@@ -220,7 +219,6 @@ ProjectModel.prototype.saveTranslation = function saveTranslation( xhr ){
   if( !found )
     this.translations.push( trans );
 
-  console.log(xhr, trans.content );
   if( xhr )
     $.ajax({
       url: '/openeras/projects/'+this.id+'/translation',
@@ -228,7 +226,6 @@ ProjectModel.prototype.saveTranslation = function saveTranslation( xhr ){
       type: 'patch',
       dataType: 'json'
     }).done( function( response ){
-      console.log('done');
       if( !response.success )
         iox.flash.rails( response.flash );
     });

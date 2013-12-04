@@ -18,6 +18,7 @@ MiniOpeneras::Engine.routes.draw do
       collection do
         post :make_template
         post :apply_project
+        post :apply_systemwide
       end
     end
   end

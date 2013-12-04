@@ -32,13 +32,18 @@ module Openeras
     accepts_nested_attributes_for :translations
 
     def venue_name
-      names = []
-      if events && events.size > 0 
-        events.each do |event|
-          names << event.venue.name if event.venue && !names.include?(event.venue.name)
-        end
+      unique_venues.map{ |v| v.name }.join(',')
+    end
+
+    def unique_venues
+      vens = []
+      venids = []
+      venues.each do |ven|
+        next if venids.include?(ven.id)
+        venids << ven.id
+        vens << ven
       end
-      names.join(',')
+      vens
     end
 
     def translation

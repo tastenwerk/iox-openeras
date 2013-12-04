@@ -101,6 +101,9 @@ de:
       update_this_event_desc: "Übernimmt diese Preise für alle Termine dieser Veranstaltung"
       make_template: "Als Standard festlegen"
       make_template_desc: "Diese Preise für zukünftige Termine als Vorlage definieren"
+      apply_systemwide: "Systemweit anwenden"
+      apply_systemwide_desc: "Diese Preise auf sämtliche in der Zukunft stattfindende Termine im System anwenden"
+      systemwide_updated: "Preise für zukünftige Veranstaltungen wurden systemweit aktualisiert"
       project_updated: "Alle Termine aus Projekt %{name} wurden mit diesen Preisen aktualisiert"
       made_template: "Diese Preise werden nun für zukünftige Projekte als Vorlage Verwendet"
 
