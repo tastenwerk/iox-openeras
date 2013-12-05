@@ -78,6 +78,7 @@ function setupPeopleGrid( item, $container ){
             fields: {
               'name': { editable: true, validation: { required: true } },
               'function': { editable: true },
+              'position': { type: 'integer', editable: false },
               'updated_at': { editable: false }
             }
           }
@@ -126,5 +127,70 @@ function setupPeopleGrid( item, $container ){
   $container.find('.add-person').on('click', function(){
     kGrid.data('kendoGrid').addRow();
   });
+
+
+    kGrid.kendoDraggable({
+        filter: "tbody > tr",
+        group: "gridGroup",
+        hint: function(e) {
+            return $('<div class="k-grid k-widget"><table><tbody><tr>' + e.html() + '</tr></tbody></table></div>');
+        }
+    });
+    
+    kGrid.kendoDropTarget({
+        group: "gridGroup",
+        drop: function(e) {
+          var target;
+          if( $(e.draggable.currentTarget).is('tr') )
+            target = peopleDataSource.getByUid($(e.draggable.currentTarget).attr('data-uid'));
+          else
+            target = peopleDataSource.getByUid($(e.draggable.currentTarget).closest('tr').attr('data-uid'));
+
+          e.draggable.hint.hide();
+          var dest = $(document.elementFromPoint(e.clientX, e.clientY));
+          
+          if( dest.is('th') )
+            return;
+
+          if( dest.is('tr') )
+            dest = peopleDataSource.getByUid( dest.attr('data-uid') );
+          else
+            dest = peopleDataSource.getByUid( dest.closest('tr').attr('data-uid') );
+  
+          //console.log( target, dest );
+          ////not on same item
+          //if( target && dest && target.get("id") !== dest.get("id")) {
+          //    //reorder the items
+          //    var tmp = target.get("position");
+          //    console.log('pos', tmp);
+          //    target.set("position", dest.get("position"));
+          //    dest.set("position", tmp);
+          //    
+          //    peopleDataSource.sort({ field: "position", dir: "asc" });
+          //}                
+
+          reorderIds = [];
+          kGrid.find('tr[role=row]').each( function(){
+            var id = peopleDataSource.getByUid( $(this).attr('data-uid') ).id;
+            if( id === dest.get('id') ){
+              reorderIds.push( dest.get('id') );
+              reorderIds.push( target.get('id') );
+            }
+            if( id !== target.get('id') && id !== dest.get('id') )
+              reorderIds.push( id );
+            $.ajax({
+              url: '/openeras/project/'+item.id+'/project_people/reorder',
+              data: { ids: reorderIds },
+              type: 'post',
+              dataType: 'json'
+            }).done( function( response ){
+              iox.flash.rails(response.flash);
+              peopleDataSource.sort({ field: "position", dir: "asc" });
+            });
+          });
+
+        }
+    });
+
 
 }

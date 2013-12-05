@@ -5,6 +5,7 @@ class CreateOpenerasProjectPeople < ActiveRecord::Migration
       t.string          :function
       t.belongs_to      :project
       t.belongs_to      :person
+      t.integer         :position
       t.timestamps
 
     end
