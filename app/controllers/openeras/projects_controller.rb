@@ -115,6 +115,13 @@ module Openeras
       if @project = get_project
         if can_modify?( @project )
           @project.set_creator_and_updater( current_user )
+          if params[:project][:label_ids] && params[:project][:label_ids].is_a?(Hash)
+            ids = []
+            params[:project][:label_ids].each_pair do |id,label|
+              ids << label[:id]
+            end
+            params[:project][:label_ids] = ids
+          end
           @project.update project_params
           if @project.save
 
