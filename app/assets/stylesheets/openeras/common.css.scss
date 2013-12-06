@@ -169,6 +169,10 @@
   padding: 0 5px;
 }
 
+.files-list .details a.move{
+  cursor: move;
+}
+
 .files-list .details a:hover{
   color: #333;
 }

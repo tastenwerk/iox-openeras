@@ -24,26 +24,31 @@ module Openeras
     validates_attachment :file,
                         attachment_presence: true,
                         dimensions: { :width => 300, :height => 300 },
-                        content_type: { :content_type => ['image/jpg', 'image/png', 'image/jpeg', 'image/gif'] },
+                        content_type: { content_type: %w( 
+                                        image/jpg 
+                                        image/png 
+                                        image/jpeg 
+                                        image/gif 
+                                        application/pdf 
+                                        application/mp3 
+                                        application/x-mp3 
+                                        audio/mpeg 
+                                        audio/mp3 
+                                        application/msword 
+                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document 
+                                        )
+                        },
                         size: { in: 0..10.megabytes },
                         on: :create
 
-    validates_attachment :file, content_type: { 
-      content_type: [ "application/pdf", 
-                      "image/jpg", 
-                      "image/png", 
-                      "image/gif", 
-                      "image/jpeg", 
-                      'application/mp3', 
-                      'application/x-mp3', 
-                      'audio/mpeg', 
-                      'audio/mp3' ] 
-      }
-
-    before_post_process :skip_for_audio
+    before_post_process :skip_for_audio, :skip_for_pdf
 
     def skip_for_audio
       ! %w(application/mp3 application/x-mp3 audio/mpeg audio/mp3 audio/ogg application/ogg).include?(file_content_type)
+    end
+
+    def skip_for_pdf
+      ! %w(application/pdf).include?(file_content_type)
     end
 
     def as_json(options = { })
@@ -106,6 +111,10 @@ module Openeras
 
     def cropping?
       crop_x && crop_y && crop_w && crop_h
+    end
+
+    def to_param
+      [id, name.parameterize].join("-")
     end
 
     private

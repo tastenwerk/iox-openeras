@@ -10,17 +10,17 @@ module Openeras
     belongs_to  :creator, class_name: 'Iox::User', foreign_key: 'created_by'
     belongs_to  :updater, class_name: 'Iox::User', foreign_key: 'updated_by'
     has_many    :events, -> { order(:starts_at) }, class_name: 'Openeras::Event', dependent: :destroy
-    has_many    :images, -> { order(:position) }, class_name: 'Openeras::File', dependent: :destroy
 
     has_many    :labeled_items, dependent: :destroy
     has_many    :labels, through: :labeled_items
 
     has_many    :venues, through: :events
 
-    has_many    :project_people, dependent: :destroy
+    has_many    :project_people, -> { order(:position) }, dependent: :destroy
     has_many    :people, through: :project_people
 
-    has_many    :files, as: :fileable, dependent: :destroy
+    has_many    :files, -> { order(:position) }, as: :fileable, dependent: :destroy
+    has_many    :images, -> { where("file_content_type LIKE 'image%'").order(:position) }, class_name: 'Openeras::File', as: :fileable, dependent: :destroy
 
     validates   :title, presence: true, length: { in: 2..255 }
     validates   :subtitle, length: { maximum: 255 }
@@ -62,6 +62,13 @@ module Openeras
 
     def to_param
       [id, title.parameterize].join("-")
+    end
+
+    def get_youtube_url
+      return '' if youtube_url.blank?
+      return youtube_url if youtube_url.split('=').size < 2
+      youtube_id = youtube_url.split('=')[1]
+      "//www.youtube.com/embed/#{youtube_id}"
     end
 
     def as_json(options = { })

@@ -135,11 +135,14 @@ function setupFileUpload( item, $container ){
     done: function( e, data ){
       $(this).closest('.upload-container').removeClass('drop-here');
       var response = data._response.result;
-      var file = response.item;
-      file.description = ko.observable(file.description);
-      file.copyright = ko.observable(file.copyright);
-      file.thumb_url = ko.observable(file.thumb_url);
-      item.files.push( file );
+      if( response.success ){
+        var file = response.item;
+        file.description = ko.observable(file.description);
+        file.copyright = ko.observable(file.copyright);
+        file.thumb_url = ko.observable(file.thumb_url);
+        item.files.push( file );
+      } else
+        iox.flash.rails( response.flash );
       setTimeout( function(){
         $('#files-progress .bar').css( 'width', 0 );
       }, 500 );
@@ -167,6 +170,7 @@ function setupProjectForm( response, $container ){
     setupPeopleGrid( item, $container );
     setupCKEDITOR( $container.find('.editor') );
     setupFileUpload( item, $container );
+    setupFileReorder( item, $container );
 
     $container.find('#project-age').kendoNumericTextBox({
       format: "# Jahren"
@@ -185,6 +189,26 @@ function setupProjectForm( response, $container ){
 
   }
   $container.find('input[type=text]:visible:first').focus();
+}
+
+function setupFileReorder( item, $container ){
+  $('#files-list').sortable({
+    handle: '.move',
+    stop: function( e, ui ){
+      var newOrderIds = [];
+      $('#files-list li').each( function(){
+        newOrderIds.push( $(this).attr('data-id') ); 
+      });
+      $.ajax({
+        url: '/openeras/files/reorder',
+        data: { file_ids: newOrderIds },
+        dataType: 'json',
+        type: 'post'
+      }).done( function( response ){
+        iox.flash.rails( response.flash );
+      });
+    }
+  });
 }
 
 function filterProjectsByLabel( item, e ){
