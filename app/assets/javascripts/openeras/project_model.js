@@ -77,6 +77,14 @@ ProjectModel.prototype.removeItem = function removeItem( item ){
 }
 
 /**
+ * update the country
+ */
+ProjectModel.prototype.updateCountry = function upateCountry( item, e ){
+  this.set('country', $(e.target).find('option:selected').val() );
+  console.log( this.get('country') );
+}
+
+/**
  * publish/unpublish this item
  */
 ProjectModel.prototype.publishItem = function publishItem( item, e ){
