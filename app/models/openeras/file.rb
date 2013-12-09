@@ -24,26 +24,31 @@ module Openeras
     validates_attachment :file,
                         attachment_presence: true,
                         dimensions: { :width => 300, :height => 300 },
-                        content_type: { :content_type => ['image/jpg', 'image/png', 'image/jpeg', 'image/gif'] },
+                        content_type: { content_type: %w( 
+                                        image/jpg 
+                                        image/png 
+                                        image/jpeg 
+                                        image/gif 
+                                        application/pdf 
+                                        application/mp3 
+                                        application/x-mp3 
+                                        audio/mpeg 
+                                        audio/mp3 
+                                        application/msword 
+                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document 
+                                        )
+                        },
                         size: { in: 0..10.megabytes },
                         on: :create
 
-    validates_attachment :file, content_type: { 
-      content_type: [ "application/pdf", 
-                      "image/jpg", 
-                      "image/png", 
-                      "image/gif", 
-                      "image/jpeg", 
-                      'application/mp3', 
-                      'application/x-mp3', 
-                      'audio/mpeg', 
-                      'audio/mp3' ] 
-      }
-
-    before_post_process :skip_for_audio
+    before_post_process :skip_for_audio, :skip_for_pdf
 
     def skip_for_audio
       ! %w(application/mp3 application/x-mp3 audio/mpeg audio/mp3 audio/ogg application/ogg).include?(file_content_type)
+    end
+
+    def skip_for_pdf
+      ! %w(application/pdf).include?(file_content_type)
     end
 
     def as_json(options = { })
@@ -78,18 +83,20 @@ module Openeras
       self.crop_h = get_dim( size, 'h' )
       file.reprocess! size.to_sym
     end
+
     # returns the dimensions given by size
     # to shrink original image and make it
     # fit into the smaller version's box
-    def get_dim_w_or_h( size )
-      if get_dim( size, 'w' ) < get_dim( size, 'h' )
-        return "width: #{get_dim( size, 'w' )}px;"
+    def get_dim_w_or_h( size, orig=false )
+      puts "dims: #{get_dim(:original, 'w')} x #{get_dim(:original, 'h')}"
+      if get_dim( :original, 'w', orig ) < get_dim( :original, 'h', orig )
+        return "width: #{get_dim( size, 'w', orig )}px;"
       else
-        return "height: #{get_dim( size, 'h' )}px;"
+        return "height: #{get_dim( size, 'h', orig )}px;"
       end
     end
 
-    def get_dim( req_size, w_or_h )
+    def get_dim( req_size, w_or_h, orig=false )
       Rails.configuration.iox.webfile_sizes.each_pair do |size, dim|
 
         next unless dim.include?('x') # break if no 'x'
@@ -97,7 +104,12 @@ module Openeras
         if req_size.to_s == size.to_s
           width = dim.split('x')[0]
           height = dim.split('x')[1].sub(/[\>\<\^\!\#]/,'')
-          return w_or_h.include?('w') ? width.to_i : height.to_i
+          if orig
+            geo = Paperclip::Geometry.from_file(file.path(req_size))
+            return w_or_h.include?('w') ? geo.width : geo.height
+          else
+            return w_or_h.include?('w') ? width.to_i : height.to_i
+          end
         end
 
       end
@@ -106,6 +118,10 @@ module Openeras
 
     def cropping?
       crop_x && crop_y && crop_w && crop_h
+    end
+
+    def to_param
+      [id, name.parameterize].join("-")
     end
 
     private

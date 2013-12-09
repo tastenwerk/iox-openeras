@@ -3,6 +3,7 @@
   <img data-bind="attr: { src: thumb_url }" />
   <div class="details">
     <span class="filesize" data-bind="text: (file_file_size/1000.0).toString()+' kB'"></span>
+    <a class="move btn"><i class="icon-arrows"></i></a>
     <a class="download btn" target="_blank" data-bind="attr: { href: original_url }">
       <i class="icon-download"></i>
     </a>
@@ -16,6 +17,9 @@
   </div>
   <div class="info">
     <h4 data-bind="text: name"></h4>
+    <!-- ko if: file_content_type.indexOf( 'image' ) < 0 -->
+    <div class="description" data-bind="text: file_content_type"></div>
+    <!-- /ko -->
     <div class="description" data-bind="text: description"></div>
     <div class="copyright" data-bind="text: copyright"></div>
   </div>

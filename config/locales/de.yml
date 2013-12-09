@@ -46,12 +46,16 @@ de:
       view: "Ansicht in Website"
       title_required: "Projekttitel ist Pflichtfeld"
 
+      drag_to_change_order_of_people: "Klicken und Ziehen um die Ordnung der Personen zu ändern"
+      people_order_saved: "Neue Ordnung der Mitwirkenden wurde gespeichert"
+      people_order_could_not_be_saved: "Neue Ordnung konnte nicht gespeichert werden"
+
       general: "Allgemein"
       dates: "Termine"
       location: "Spielort"
       files: "Medien"
 
-      text_and_langs: "Beschreibung"
+      text_and_langs: "Text"
       cast: "Personen"
       body: "Textkörper"
 
@@ -131,3 +135,7 @@ de:
       name: "Dateiname"
       coords_saved: "Position für %{size} von Bild &raquo;%{name}&laquo; wurden gespeichert"
       coords_saving_failed: "Positionen für %{size} von Bild &raquo;%{name}&laquo; konnten nicht gespeichert werden"
+      order_saved: "Neue Ordnung wurde gespeichert"
+      order_saving_failed: "Neue Ordnung konnte nicht gespeichert werden"
+      uploaded: "%{name} wurde auf den Server hochgeladen und gespeichert"
+      upload_error: "Hochladen fehlgeschlagen. Grund: %{reason}"

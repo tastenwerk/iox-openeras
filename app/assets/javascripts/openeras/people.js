@@ -79,14 +79,14 @@ function setupPeopleGrid( item, $container ){
               'name': { editable: true, validation: { required: true } },
               'function': { editable: true },
               'position': { type: 'integer', editable: false },
-              'updated_at': { editable: false }
+              'updated_at': { editable: false, type: 'date' }
             }
           }
         },
         serverPaging: true,
         serverFiltering: true,
         serverSorting: true,
-        sort: { field: "person", dir: "asc" }
+        sort: { field: "position", dir: "asc" }
     });
 
 
@@ -156,37 +156,26 @@ function setupPeopleGrid( item, $container ){
             dest = peopleDataSource.getByUid( dest.attr('data-uid') );
           else
             dest = peopleDataSource.getByUid( dest.closest('tr').attr('data-uid') );
-  
-          //console.log( target, dest );
-          ////not on same item
-          //if( target && dest && target.get("id") !== dest.get("id")) {
-          //    //reorder the items
-          //    var tmp = target.get("position");
-          //    console.log('pos', tmp);
-          //    target.set("position", dest.get("position"));
-          //    dest.set("position", tmp);
-          //    
-          //    peopleDataSource.sort({ field: "position", dir: "asc" });
-          //}                
 
           reorderIds = [];
           kGrid.find('tr[role=row]').each( function(){
             var id = peopleDataSource.getByUid( $(this).attr('data-uid') ).id;
             if( id === dest.get('id') ){
-              reorderIds.push( dest.get('id') );
               reorderIds.push( target.get('id') );
+              reorderIds.push( dest.get('id') );
             }
             if( id !== target.get('id') && id !== dest.get('id') )
               reorderIds.push( id );
-            $.ajax({
-              url: '/openeras/project/'+item.id+'/project_people/reorder',
-              data: { ids: reorderIds },
-              type: 'post',
-              dataType: 'json'
-            }).done( function( response ){
-              iox.flash.rails(response.flash);
-              peopleDataSource.sort({ field: "position", dir: "asc" });
-            });
+          });
+
+          $.ajax({
+            url: '/openeras/project_people/reorder',
+            data: { pp_ids: reorderIds },
+            type: 'post',
+            dataType: 'json'
+          }).done( function( response ){
+            iox.flash.rails(response.flash);
+            peopleDataSource.sort({ field: "position", dir: "asc" });
           });
 
         }

@@ -13,6 +13,12 @@ MiniOpeneras::Engine.routes.draw do
     end
   end
 
+  resources :project_people do
+    collection do
+      post :reorder
+    end
+  end
+
   resources :events do
     resources :prices do
       collection do
@@ -26,6 +32,9 @@ MiniOpeneras::Engine.routes.draw do
   resources :files do
     member do
       post :coords
+    end
+    collection do
+      post :reorder
     end
   end
   

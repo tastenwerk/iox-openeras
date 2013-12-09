@@ -3,9 +3,17 @@ module Openeras
 
     before_filter :authenticate!
 
+
+    {"sort"=>{"0"=>{"field"=>"position", "dir"=>"asc"}},
+    }
     def index
       @project = get_project
-      @people = @project.project_people.load
+      @people = @project.project_people
+      order = "position asc"
+      if params[:sort] && params[:sort]['0']
+        order = "#{params[:sort]['0'][:field]} #{params[:sort]['0'][:dir]}"
+      end
+      @people = @people.order(order).load
       render json: { items: @people, total: @people.size }
     end
 
@@ -40,6 +48,23 @@ module Openeras
         notify_404
       end
       render json: { item: @person, success: flash[:alert].blank?, flash: flash }
+    end
+
+    def reorder
+      errors = []
+      params[:pp_ids].each_with_index do |project_person_id, i|
+        if pp = ProjectPerson.find_by_id( project_person_id )
+          errors << pp.errors.full_messages unless pp.update position: i
+        else
+          errors << "not found #{project_person_id}"
+        end
+      end
+      if errors.size == 0
+        flash.notice = t('project.people_order_saved')
+      else
+        flash.alert = t('project.people_order_could_not_be_saved')
+      end
+      render json: { success: flash[:alert].blank?, flash: flash }
     end
 
     def destroy

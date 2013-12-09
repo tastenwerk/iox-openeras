@@ -75,6 +75,16 @@
         </div>
 
         <div class="field-box w-input">
+          <label for="title" class="icon" title="Youtube URL"><i class="icon-youtube-square"></i></label>
+          <input type="text" name="project[youtube_url]" placeholder="http://youtube.com/..." data-bind="value: youtube_url" />
+        </div>
+
+        <div class="field-box w-input">
+          <label for="title" class="icon" title="Vimeo URL"><i class="icon-vimeo-square"></i></label>
+          <input type="text" name="project[vimeo_url]" placeholder="http://vimeo.com/..." data-bind="value: vimeo_url" />
+        </div>
+
+        <div class="field-box w-input">
           <label for="title"><%= t('openeras.project.age') %></label>
           <input type="text" id="project-age" placeholder="<%= t('openeras.project.age_placeholder') %>" name="project[age]" data-bind="value: age" class="numeric-select" />
         </div>
@@ -136,6 +146,8 @@
     </div>
 
     <div class="clearfix iox-content-padding hide">
+
+      <div class="desc"><%= t('project.drag_to_change_order_of_people') %></div>
 
       <div class="iox-grid-header clearfix">
         <a class="add-person btn" title="<%= t('openeras.person.new') %>"><i class="icon-plus"></i></a>

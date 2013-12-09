@@ -6,7 +6,7 @@ module Openeras
 
     def index
       @project = Project.find_by_id( params[:project_id] )
-      @files = @project.files.order(@order)
+      @files = @project.files.order(:position)
       render json: @files
     end
 
@@ -20,10 +20,11 @@ module Openeras
       @file.updater = current_user
 
       if @file.save
-        render json: { flash: flash, success: flash[:alert].blank?, item: @file }
+        flash.now.notice = t('openeras.file.uploaded', name: @file.name)
       else
-        render :json => [{:error => "custom_failure"}], :status => 304
+        flash.now.alert = t('openeras.file.upload_error', reason: @file.errors.full_messages[0])
       end
+      render json: { flash: flash, success: flash[:alert].blank?, item: @file }
     end
 
     def edit
@@ -35,10 +36,10 @@ module Openeras
       if @file = Openeras::File.find_by_id( params[:id] )
         @file.updater = current_user
         if @file.update file_params
-          flash.notice = t('openeras.file.saved', name: @file.name )
+          flash.now.notice = t('openeras.file.saved', name: @file.name )
         else
           logger.error "FILE could not be saved: #{@file.errors.full_messages}"
-          flash.alert = t('openeras.file.saving_failed', name: @file.name, error: @file.errors.full_messages.inspect )
+          flash.now.alert = t('openeras.file.saving_failed', name: @file.name, error: @file.errors.full_messages.inspect )
         end
       else
         notify_404
@@ -59,6 +60,23 @@ module Openeras
         notify_404
       end
       render json: { flash: flash, success: flash[:alert].blank?, item: @file }
+    end
+
+    def reorder
+      errors = []
+      params[:file_ids].each_with_index do |file_id,i|
+        if file = Openeras::File.find_by_id( file_id )
+          errors << file.errors.full_messages unless file.update position: i
+        else
+          errors << "not found #{file_id}"
+        end
+      end
+      if errors.size == 0
+        flash.now.notice = t('openeras.file.order_saved')
+      else
+        flash.now.alert = t('openeras.file.order_saving_failed')
+      end
+      render json: { success: flash[:alert].blank?, flash: flash }
     end
 
     def destroy
