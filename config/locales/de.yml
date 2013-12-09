@@ -94,6 +94,13 @@ de:
       saving_failed: "Spielort konnte nicht gespeichert werden"
       deleted: "Spielort &raquo;%{name}&laquo; wurde gelöscht"
       deletion_failed: "Spielort &raquo%{name}&laquo; konnte nicht gelöscht werden"
+      edit: "Spielort bearbeiten"
+      description: "Beschreibung"
+      street: "Strasse"
+      zip: "PLZ"
+      city: "Stadt"
+      lng: "Längengrad"
+      lat: "Breitengrad"
 
     price:
       add: "Neuen Preis anlegen"

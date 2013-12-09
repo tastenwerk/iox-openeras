@@ -40,14 +40,8 @@ module Openeras
       render json: { item: @venue, flash: flash, success: flash[:alert].blank? }
     end
 
-    def edit
-      check_404_and_privileges
-      @layout = (!params[:layout] || params[:layout] === 'true')
-      render layout: @layout
-    end
-
     def update
-      if check_404_and_privileges
+      if @venue = Openeras::Venue.find_by_id( params[:id] )
         @venue.updater = current_user
         @venue.attributes = venue_params
         if @venue.save

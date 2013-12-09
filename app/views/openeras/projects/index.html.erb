@@ -88,6 +88,9 @@
   <li data-bind=" attr: { 'data-id': id, id: 'item_'+id }, click: filterProjectsByVenue">
     <div class="item clearfix" data-bind=" css: { selected: _selected, hide: _hide }">
       <div class="actions">
+        <a href="#" data-bind="click: editVenue" class="remove-item" title="<%= t('openeras.venue.edit') %>">
+          <span class="icon-edit"></span>
+        </a>
         <a href="#" data-bind="click: removeItem" class="remove-item" title="<%= t('delete') %>">
           <span class="icon-close"></span>
         </a>
@@ -96,6 +99,8 @@
     </div>
   </li>
 </script>
+
+<%= render partial: 'openeras/venues/form_tmpl' %>
 
 <script type="text/javascript">
 
@@ -210,7 +215,35 @@
            */
           listContent: function listContent( item, e ){
             console.log('list content');
+          },
+
+          /**
+           * edit venue
+           */
+          editVenue: function editVenue( item, e ){
+            new iox.Win({
+              content: $('#edit-venue-form').clone(),
+              width: 700,
+              height: 500,
+              completed: function( $win ){
+                ko.applyBindings( item, $win.get(0) );
+              }
+            });
+          },
+
+          saveItem: function saveItem( form ){
+            $.ajax({
+              url: '/openeras/venues/'+this.id,
+              type: 'patch',
+              dataType: 'json',
+              data: $(form).serializeArray()
+            }).done( function( response ){
+              iox.flash.rails( response.flash );
+              if( response.success )
+                $(form).closest('.iox-win').data('ioxWin').close();
+            });
           }
+
 
         },
 

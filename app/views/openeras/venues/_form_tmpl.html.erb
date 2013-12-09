@@ -1,0 +1,52 @@
+<div id="edit-venue-form">
+
+  <div data-iox-win-title="true"><%= t('venue.edit') %></div>
+  <form class="iox-form" data-bind="submit: saveItem">
+
+    <div class="content-padding">
+
+      <div class="field-box">
+        <label><%= t('name') %></label>
+        <input type="text" name="venue[name]" data-bind="value: name" />
+      </div>
+
+      <div class="field-box">
+        <label><%= t('venue.description') %></label>
+        <input type="text" name="venue[description]" data-bind="value: description" />
+      </div>
+
+      <div class="field-box">
+        <label><%= t('venue.street') %></label>
+        <input type="text" name="venue[street]" data-bind="value: street" />
+      </div>
+
+      <div class="field-box">
+        <label><%= t('venue.zip') %></label>
+        <input type="text" name="venue[zip]" data-bind="value: zip" />
+      </div>
+
+      <div class="field-box">
+        <label><%= t('venue.city') %></label>
+        <input type="text" name="venue[city]" data-bind="value: city" />
+      </div>
+
+      <div class="field-box">
+        <label><%= t('venue.lat') %></label>
+        <input type="text" name="venue[lat]" data-bind="value: lat" />
+      </div>
+
+      <div class="field-box">
+        <label><%= t('venue.lng') %></label>
+        <input type="text" name="venue[lng]" data-bind="value: lng" />
+      </div>
+
+    </div>
+
+    <div class="iox-win-footer">
+      <button class="btn btn-success pull-right"><%= t('save') %></button>
+      <button class="btn cancel-btn"><%= t('cancel') %></button>
+    </div>
+
+  </form>
+
+</div>
