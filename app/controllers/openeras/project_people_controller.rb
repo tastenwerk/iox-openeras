@@ -9,11 +9,14 @@ module Openeras
     def index
       @project = get_project
       @people = @project.project_people
-      order = "position asc"
+      order = "openeras_project_people.position asc"
       if params[:sort] && params[:sort]['0']
-        order = "#{params[:sort]['0'][:field]} #{params[:sort]['0'][:dir]}"
+        name = params[:sort]['0'][:field]
+        name = "openeras_people.name" if name == 'name'
+        name = "openeras_project_people.position" if name == 'position'
+        order = "#{name} #{params[:sort]['0'][:dir]}"
       end
-      @people = @people.order(order).load
+      @people = @people.references(:openeras_people).includes(:person).order(order).load
       render json: { items: @people, total: @people.size }
     end
 

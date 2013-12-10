@@ -1,42 +1,42 @@
-<div id="edit-venue-form">
+<div id="edit-venue-form" style="display: none">
 
-  <div data-iox-win-title="true"><%= t('venue.edit') %></div>
+  <div data-iox-win-title="true"><%= t('openeras.venue.edit') %></div>
   <form class="iox-form" data-bind="submit: saveItem">
 
-    <div class="content-padding">
+    <div class="content-padding auto-overflow" style="height: 255px">
 
-      <div class="field-box">
+      <div class="field-box w-input">
         <label><%= t('name') %></label>
         <input type="text" name="venue[name]" data-bind="value: name" />
       </div>
 
-      <div class="field-box">
-        <label><%= t('venue.description') %></label>
+      <div class="field-box w-input">
+        <label><%= t('openeras.venue.description') %></label>
         <input type="text" name="venue[description]" data-bind="value: description" />
       </div>
 
-      <div class="field-box">
-        <label><%= t('venue.street') %></label>
+      <div class="field-box w-input">
+        <label><%= t('openeras.venue.street') %></label>
         <input type="text" name="venue[street]" data-bind="value: street" />
       </div>
 
-      <div class="field-box">
-        <label><%= t('venue.zip') %></label>
+      <div class="field-box w-input">
+        <label><%= t('openeras.venue.zip') %></label>
         <input type="text" name="venue[zip]" data-bind="value: zip" />
       </div>
 
-      <div class="field-box">
-        <label><%= t('venue.city') %></label>
+      <div class="field-box w-input">
+        <label><%= t('openeras.venue.city') %></label>
         <input type="text" name="venue[city]" data-bind="value: city" />
       </div>
 
-      <div class="field-box">
-        <label><%= t('venue.lat') %></label>
+      <div class="field-box w-input">
+        <label><%= t('openeras.venue.lat') %></label>
         <input type="text" name="venue[lat]" data-bind="value: lat" />
       </div>
 
-      <div class="field-box">
-        <label><%= t('venue.lng') %></label>
+      <div class="field-box w-input">
+        <label><%= t('openeras.venue.lng') %></label>
         <input type="text" name="venue[lng]" data-bind="value: lng" />
       </div>
 

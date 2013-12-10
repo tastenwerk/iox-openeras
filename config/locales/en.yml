@@ -1,0 +1,141 @@
+en:
+  projects:
+    title: "Veranstaltungen / Termine"
+
+  openeras:
+
+    meta_information: "Meta Informationen (Suchmaschinen)"
+
+    venues:
+      title: "Spielorte"
+
+    labels:
+      title: "Labels"
+
+    label:
+      new: "Neues Label"
+      give_name: "Name des neuen Labels"
+
+    person:
+      new: "Neue Person"
+      function: "Funktion"
+      name: "Name"
+      saved: "Person &raquo;%{name}&laquo; wurde gespeichert"
+      saving_failed: "Person konnte nicht gespeichert werden"
+      removed: "Person &raquo;%{name}&laquo; wurde gelöscht"
+      removing_failed: "Person &raquo;%{name}&laquo; konnte nicht gelöscht werden"
+
+    project:
+      new: "Neues Projekt"
+      title: "Projekttitel"
+      subtitle: "Untertitel"
+      authors: "Autor(en)"
+      ensemble: "Ensemble"
+      country: "Land"
+      meta_description: "Kurzbeschreibung"
+      meta_description_desc: "Diese Beschreibung wird bei Kurzinfos und von Suchmaschinen verwendet. Maximal 255 Zeichen"
+      meta_keywords: "Schlagwörter"
+      meta_keywords_desc: "Werden bei der Suche und von manchen Suchmaschinen berücksichtigt und zur feineren Kategorisierung verwendet"
+      starts_at: "Beginnt"
+      ends_at: "Endet"
+      age: "geeignet ab"
+      age_placeholder: "Alter in Jahren (z.B. 8)"
+      duration: "Dauer"
+      duration_placeholder: "Dauer in Minuten (z.B. 90)"
+      venue_name: "Spielort"
+      view: "Ansicht in Website"
+      title_required: "Projekttitel ist Pflichtfeld"
+
+      drag_to_change_order_of_people: "Klicken und Ziehen um die Ordnung der Personen zu ändern"
+      people_order_saved: "Neue Ordnung der Mitwirkenden wurde gespeichert"
+      people_order_could_not_be_saved: "Neue Ordnung konnte nicht gespeichert werden"
+
+      general: "Allgemein"
+      dates: "Termine"
+      location: "Spielort"
+      files: "Medien"
+
+      text_and_langs: "Text"
+      cast: "Personen"
+      body: "Textkörper"
+
+      lang: "Sprache"
+
+      not_saved_yet_save_q: "Soll das Projekt gleich gespeichert werden?"
+
+      has_been_published: "Projekt &raquo;%{name}&laquo; wurde veröffentlicht"
+      has_been_unpublished: "Veröffentlichung von &raquo;%{name}&laquo; wurde zurückgezogen"
+      delete: "Projekt löschen"
+      deleted: "Projekt &raquo;%{name}&laquo; wurde gelöscht <a href='/openeras/projects/%{id}/restore' data-method='post' data-remote='true'><i class='flash-icon icon-undo'></i> Wiederherstellen</a>"
+      restored: "Project &raquo;%{name}&laquo; wurde wiederhergestellt"
+      dates: "Termine"
+
+      removed_person: "Funktion von &raquo;%{name}&laquo; wurde gelöscht"
+      removing_person_failed: "Funktion von &raquo;%{name}&laquo; konnte nicht gelöscht werden"
+
+    event:
+      new: "Neuer Termin"
+      starts_at: "Beginnt"
+      ends_at: "Endet"
+      all_day: "ganztags"
+      venue: "Spielort"
+      note: "Notiz"
+      event_type: "Typ"
+      deleted: "Termin vom %{starts} wurde gelöscht"
+      deletion_failed: "Termin konnte nicht gelöscht werden"
+      general: "Allgemein"
+      tickets: "Tickets"
+      prices: "Kartenpreise"
+      available_seats: "Sitzplätze"
+      saved: "Termin vom %{starts} in %{venue} gespeichert"
+      saving_failed: "Termin konnte nicht gespeichert werden"
+      prices_cannot_be_edited_until_saved: "Kartenpreise können erst bearbeitet werden, wenn dieser Termin gespeichert wurde"
+
+    venue:
+      new: "Neuer Spielort"
+      give_name: "Gib dem Spielort einen Namen"
+      saved: "Spielort &raquo;%{name}&laquo; wurde gespeichert"
+      saving_failed: "Spielort konnte nicht gespeichert werden"
+      deleted: "Spielort &raquo;%{name}&laquo; wurde gelöscht"
+      deletion_failed: "Spielort &raquo%{name}&laquo; konnte nicht gelöscht werden"
+      edit: "Spielort bearbeiten"
+      description: "Beschreibung"
+      street: "Strasse"
+      zip: "PLZ"
+      city: "Stadt"
+      lng: "Längengrad"
+      lat: "Breitengrad"
+
+    price:
+      add: "Neuen Preis anlegen"
+      update_this_event: "In allen Terminen übernehmen"
+      update_this_event_desc: "Übernimmt diese Preise für alle Termine dieser Veranstaltung"
+      make_template: "Als Standard festlegen"
+      make_template_desc: "Diese Preise für zukünftige Termine als Vorlage definieren"
+      apply_systemwide: "Systemweit anwenden"
+      apply_systemwide_desc: "Diese Preise auf sämtliche in der Zukunft stattfindende Termine im System anwenden"
+      systemwide_updated: "Preise für zukünftige Veranstaltungen wurden systemweit aktualisiert"
+      project_updated: "Alle Termine aus Projekt %{name} wurden mit diesen Preisen aktualisiert"
+      made_template: "Diese Preise werden nun für zukünftige Projekte als Vorlage Verwendet"
+
+    file:
+      upload: "Hochladen"
+      saving_failed: "Datei konnte nicht gespeichert werden"
+      saved: "Datei %{name} wurde gespeichert"
+      deletion_failed: "Datei %{name} konnte nicht gelöscht werden (Grund: %{error})"
+      deleted: "Datei %{name} wurde gelöscht"
+      delete_q: "Datei löschen?"
+      description: "Beschreibung"
+      copyright: "Copyright"
+      settings: "Einstellungen"
+      apply_all: "Auf alle Dateien dieses Projektes anwenden"
+      apply_all_desc: "Wendet 'Beschreibung' und 'Copyright' auf alle Dateien in diesem Projekt an"
+      applying_successful: "Einstellungen wurden auf alle Dateien von &raquo;%{name}&laquo; angewendet"
+      images: "Bilder"
+      name: "Dateiname"
+      coords_saved: "Position für %{size} von Bild &raquo;%{name}&laquo; wurden gespeichert"
+      coords_saving_failed: "Positionen für %{size} von Bild &raquo;%{name}&laquo; konnten nicht gespeichert werden"
+      order_saved: "Neue Ordnung wurde gespeichert"
+      order_saving_failed: "Neue Ordnung konnte nicht gespeichert werden"
+      uploaded: "%{name} wurde auf den Server hochgeladen und gespeichert"
+      upload_error: "Hochladen fehlgeschlagen. Grund: %{reason}"

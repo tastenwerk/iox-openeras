@@ -71,6 +71,13 @@ module Openeras
       "//www.youtube.com/embed/#{youtube_id}"
     end
 
+    def get_vimeo_url
+      return '' if vimeo_url.blank?
+      return vimeo_url if vimeo_url.split('vimeo.com/').size < 2
+      vimeo_id = vimeo_url.split('vimeo.com/')[1]
+      "//player.vimeo.com/video/#{vimeo_id}"
+    end
+
     def as_json(options = { })
       h = super(options)
       h[:venue_id] = venue_id
