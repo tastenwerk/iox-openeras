@@ -87,6 +87,7 @@ module Openeras
       h[:locale] = locale || I18n.locale
       h[:labels] = new_record? ? [] : labels
       h[:files] = new_record? ? [] : files
+      h[:image_thumb_url] = files.size > 0 ? images.first.file.url(:thumb) : nil
       h[:to_param] = to_param unless new_record?
       h[:available_locales] = Rails.configuration.iox.available_langs || [:en]
       h[:updater_name] = updater ? updater.full_name : ( creator ? creator.full_name : '' )
