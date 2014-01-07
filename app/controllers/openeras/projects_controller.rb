@@ -1,7 +1,7 @@
 module Openeras
   class ProjectsController < Iox::ApplicationController
 
-    before_filter :authenticate!
+    before_filter :authenticate!, except: [ :ejson ]
     layout 'iox/application'
 
     def index
