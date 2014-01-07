@@ -25,7 +25,9 @@ module Openeras
 
     def as_json(options = { })
       h = super(options)
+      h[:prices] = prices
       h[:venue_name] = venue.name if venue
+      h[:venue_id] = venue.id if venue
       h[:updater_name] = updater ? updater.full_name : ( creator ? creator.full_name : '' )
       h
     end

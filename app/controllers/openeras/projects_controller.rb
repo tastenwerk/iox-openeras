@@ -258,6 +258,11 @@ module Openeras
       end
     end
 
+    def ejson
+      @projects = Project.where( published: true ).includes(:translations,:events,:venues).references('iox_translations', 'openeras_events', 'openeras_venues').load
+      render json: @projects
+    end
+
     private
 
     def get_project

@@ -11,6 +11,9 @@ MiniOpeneras::Engine.routes.draw do
       post :restore
       patch :apply_file_settings
     end
+    collection do
+      get :ejson
+    end
   end
 
   resources :project_people do

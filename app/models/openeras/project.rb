@@ -84,6 +84,7 @@ module Openeras
       h[:venue_name] = venue_name
       h[:translation] = translation
       h[:translations] = translations
+      h[:events] = events
       h[:locale] = locale || I18n.locale
       h[:labels] = new_record? ? [] : labels
       h[:files] = new_record? ? [] : files
