@@ -276,6 +276,7 @@ module Openeras
         :age,
         :duration,
         :country,
+        :online_booking,
         :ensemble_name,
         :published,
         :authors,

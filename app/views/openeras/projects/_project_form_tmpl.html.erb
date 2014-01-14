@@ -102,6 +102,12 @@
           </a>
         </div>
 
+        <div class="field-box w-input">
+          <label for="title"><%= t('openeras.project.online_booking') %></label>
+          <input type="hidden" name="project[online_booking]" value="false" />
+          <input type="checkbox" id="project-online-booking" name="project[online_booking]" data-bind="checked: online_booking" />
+        </div>
+
         <div class="desc">
           <label style="color: red">*</label> <%= t('required_field') %>
         </div>

@@ -28,6 +28,8 @@ class CreateOpenerasProjects < ActiveRecord::Migration
       t.boolean         :has_breaks
       t.integer         :age
 
+      t.boolean         :online_booking, default: true
+
       t.iox_document_defaults
       t.timestamps
       
