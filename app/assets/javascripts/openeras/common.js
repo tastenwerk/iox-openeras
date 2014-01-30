@@ -104,6 +104,7 @@ function setupLabelsSelectors( $container ){
 function setupCKEDITOR( $elem ){
 
   var editor = CKEDITOR.replace( $elem.get(0), {
+    allowedContent: true,
     removePlugins: 'elementspath',
     toolbar: [
       [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ],
