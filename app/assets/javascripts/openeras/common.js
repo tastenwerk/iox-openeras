@@ -104,12 +104,12 @@ function setupLabelsSelectors( $container ){
 function setupCKEDITOR( $elem ){
 
   var editor = CKEDITOR.replace( $elem.get(0), {
-    removePlugins: 'elementspath',
-    toolbar: [
-      [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ],
-      [ 'Bold', 'Italic', 'OrderedList', 'UnorderedList'],
-      ['Source' ]
-    ]
+    removePlugins: 'elementspath' //,
+    // toolbar: [
+    //   [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ],
+    //   [ 'Bold', 'Italic', 'OrderedList', 'UnorderedList', 'Image'],
+    //   ['Source' ]
+    // ]
   });
 
 }
