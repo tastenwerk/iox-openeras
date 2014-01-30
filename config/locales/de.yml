@@ -40,6 +40,7 @@ de:
       ends_at: "Endet"
       age: "geeignet ab"
       age_placeholder: "Alter in Jahren (z.B. 8)"
+      online_booking: "Kartenreservierung"
       duration: "Dauer"
       duration_placeholder: "Dauer in Minuten (z.B. 90)"
       venue_name: "Spielort"

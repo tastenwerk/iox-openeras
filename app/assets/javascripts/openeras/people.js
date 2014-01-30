@@ -10,7 +10,6 @@ function setupPeopleGrid( item, $container ){
   var peopleDataSource = new kendo.data.DataSource({
         transport: {
             read:  function( options ){
-
               $.ajax({
                 url: peopleUrl,
                 data: { sort: options.data.sort, filter: options.data.filter },
@@ -26,7 +25,7 @@ function setupPeopleGrid( item, $container ){
                 url: peopleUrl+'/'+model.id, 
                 type: 'patch', 
                 dataType: 'json',
-                data: { person: options.data.models[0] }
+                data: { person: model }
               }).done( function( response ){
                 if( response.success )
                   options.success();
@@ -49,11 +48,12 @@ function setupPeopleGrid( item, $container ){
             },
             create: function createCrew( options ){
               var model = options.data.models[0];
+              console.log(model);
               $.ajax({ 
                 url: peopleUrl, 
                 type: 'post', 
                 dataType: 'json',
-                data: { person: options.data.models[0] }
+                data: { person: model }
               }).done( function( response ){
                 if( response.success )
                   options.success();
@@ -76,7 +76,7 @@ function setupPeopleGrid( item, $container ){
           model: {
             id: 'id',
             fields: {
-              'name': { editable: true, validation: { required: true } },
+              'name': { editable: true },
               'function': { editable: true },
               'position': { type: 'integer', editable: false },
               'updated_at': { editable: false, type: 'date' }
@@ -112,7 +112,7 @@ function setupPeopleGrid( item, $container ){
     dataSource: peopleDataSource,
     height: $(window).height()-260,
     editable: {
-      mode: "inline"
+      mode: "popup"
     },
     resizable: false,
     navigatable: true,
